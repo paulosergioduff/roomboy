@@ -1,0 +1,12 @@
+
+services:
+  roomboy:
+    build: .
+    image: roomboy:latest
+    stdin_open: true
+    tty: true
+    ports:
+      - "127.0.0.1:1455:1455"
+    volumes:
+      - ./project:/workspace/project
+    working_dir: /workspace/project
