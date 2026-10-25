@@ -1,0 +1,3 @@
+# O projeto é montado pelo Compose em runtime e não participa do build da imagem.
+project/
+.git/
