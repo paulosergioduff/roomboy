@@ -28,4 +28,6 @@
 - Removidos os `.c` gerados da pasta de exemplos e o antigo `linguagem-natural/exemplo.c`; os C em `tests/expected/` continuam como snapshots golden.
 - `make test`: 36 passaram, 0 falharam. Os cinco exemplos foram executados e suas saídas comparadas; nenhuma compilação padrão deixou `.c` na pasta dos exemplos.
 - Testado também `-c` com saída C e confirmadas as opções `--save-c` e `--output` na ajuda.
-- Nenhum commit foi criado para esta etapa até concluir a revisão.
+- Testada a API do editor em porta temporária: compilação e execução devolveram `ok`, com código de saída zero.
+- Revisados os títulos dos commits anteriores para usar o nome DOC Script ou descrições neutras. A referência à inspiração ficou restrita à documentação de homenagem e ao registro histórico.
+- Commit funcional após a reescrita: `566e24b`. Próxima ação: atualizar `origin/main` com force-with-lease.
