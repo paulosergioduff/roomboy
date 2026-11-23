@@ -9,4 +9,6 @@
 - Criadas expectativas para atribuição inválida, declaração duplicada, função não suportada e variável não declarada.
 - Atualizado `tests/run.sh` para considerar a ausência de expectativa como falha.
 - Executado novamente `make test`: 34 passaram, 0 falharam, sem avisos.
-- Próximo passo: revisar o diff e publicar apenas os arquivos desta etapa.
+- Commit `98eac89` (`Completa expectativas dos testes Portugol`) criado e enviado para `origin/main`.
+- A publicação incluiu somente os sete arquivos da etapa; alterações preexistentes em `Dockerfile` e `find.sh` permaneceram fora.
+- Próximo passo: verificar se há outras lacunas na implementação Portugol.
