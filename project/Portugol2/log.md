@@ -30,4 +30,4 @@
 - Testado também `-c` com saída C e confirmadas as opções `--save-c` e `--output` na ajuda.
 - Testada a API do editor em porta temporária: compilação e execução devolveram `ok`, com código de saída zero.
 - Revisados os títulos dos commits anteriores para usar o nome DOC Script ou descrições neutras. A referência à inspiração ficou restrita à documentação de homenagem e ao registro histórico.
-- Commit funcional após a reescrita: `566e24b`. Próxima ação: atualizar `origin/main` com force-with-lease.
+- Commit funcional `566e24b` e histórico revisado enviados a `origin/main` por force-with-lease.
