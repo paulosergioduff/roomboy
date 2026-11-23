@@ -22,3 +22,4 @@
 - Confirmado no tokenizador: comentários entre parênteses são descartados antes do parser nos dois dialetos.
 - Adicionados comentários em parênteses a cada exemplo Portugol e ao caso golden `portugol_basico.ln`; documentada a regra compartilhada.
 - Revalidação: C gerado e saídas dos cinco exemplos permaneceram idênticos; `make test` passou com 34 aprovados e 0 falhas.
+- Commit `1e68b49` (`Documenta comentarios entre parenteses`) enviado para `origin/main`.
