@@ -17,4 +17,5 @@
 - Documentados os comandos de build, análise, geração de C, execução com arquivos `.in`, comparação com `.out` e uso pelo editor.
 - Observado e documentado que o parser ainda não permite parênteses para agrupar expressões; o exemplo da média foi escrito sem agrupamento.
 - Validação: os cinco programas executaram e corresponderam aos respectivos `.out`; `make test` terminou com 34 aprovados e 0 falhas.
-- Próximo passo: revisar e publicar os arquivos dos exemplos e documentação.
+- Commit `6eaed6c` (`Adiciona exemplos da sintaxe Portugol`) enviado para `origin/main`.
+- Os executáveis gerados durante o teste não foram incluídos no commit; a revisão automática bloqueou a remoção deles do workspace local.
