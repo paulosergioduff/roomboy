@@ -31,3 +31,10 @@
 - Testada a API do editor em porta temporária: compilação e execução devolveram `ok`, com código de saída zero.
 - Revisados os títulos dos commits anteriores para usar o nome DOC Script ou descrições neutras. A referência à inspiração ficou restrita à documentação de homenagem e ao registro histórico.
 - Commit funcional `566e24b` e histórico revisado enviados a `origin/main` por force-with-lease.
+- Criada a pasta `linguagem-natural/curso/` com curso interativo de dez aulas, navegação responsiva, editor, entrada padrão e execução via `/api/compile`.
+- Adicionadas rotas locais para servir HTML, CSS e JavaScript do curso em `/curso/`.
+- Adicionado link do editor existente para o curso.
+- `make test`: 36 passaram, 0 falharam; `node --check curso/app.js` passou.
+- Verificados os assets HTTP do editor e do curso e executados pela API os dez códigos iniciais (todos com código de saída 0).
+- Servidor local mantido ativo em http://127.0.0.1:8080/ para o usuário testar.
+- Próximo passo: revisar e publicar esta etapa.

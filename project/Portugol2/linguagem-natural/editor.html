@@ -1,0 +1,751 @@
+<!doctype html>
+<html lang="pt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DOC Script — Editor</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0; background: #1e1e1e; color: #ccc; overflow: hidden;
+    font: 13px system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  .titlebar {
+    height: 42px; background: #323233; display: flex; align-items: center;
+    gap: 10px; padding: 0 12px; border-bottom: 1px solid #181818;
+  }
+  .brand { color: #4ec9b0; font-weight: 600; letter-spacing: .3px; }
+  .brand small { color: #8a8a8a; font-weight: 400; margin-left: 6px; }
+  .course-nav {
+    color: #d5d5d5; text-decoration: none; border: 1px solid #4a4d51;
+    border-radius: 3px; padding: 5px 11px; font-size: 12px;
+  }
+  .course-nav:hover { background: #45494e; }
+  .spacer { flex: 1; }
+  button {
+    background: #3a3d41; color: #e6e6e6; border: 1px solid #4a4d51;
+    border-radius: 3px; padding: 5px 11px; font: inherit; font-size: 12px;
+    cursor: pointer;
+  }
+  button:hover { background: #45494e; }
+  button:disabled { opacity: .45; cursor: default; }
+  button.primary { background: #0e639c; border-color: #1177bb; color: #fff; }
+  button.primary:hover { background: #1177bb; }
+  button.ghost { background: transparent; border-color: transparent; color: #9a9a9a; }
+  button.ghost:hover { color: #fff; background: #3a3d41; }
+
+  .app { height: calc(100vh - 42px); display: flex; }
+  .sidebar {
+    width: 220px; flex: none; background: #252526; border-right: 1px solid #171717;
+    display: flex; flex-direction: column; padding: 12px 10px; gap: 9px; overflow: auto;
+  }
+  .sidehead {
+    font-size: 10px; letter-spacing: 1.2px; color: #8a8a8a;
+    margin: 4px 4px 0; text-transform: uppercase;
+  }
+  .file {
+    padding: 7px 9px; background: #37373d; color: #fff; font-size: 12px;
+    border-left: 2px solid #007acc;
+  }
+  .hint { color: #7a7a7a; font-size: 11px; line-height: 1.5; }
+  .hint b { color: #bdbdbd; }
+  .hint code {
+    background: #1e1e1e; border: 1px solid #333; border-radius: 3px;
+    padding: 0 3px; font-size: 10.5px; color: #cecece;
+  }
+  kbd {
+    background: #1e1e1e; border: 1px solid #444; border-bottom-width: 2px;
+    border-radius: 3px; padding: 0 4px; font: 10px ui-monospace, monospace;
+    color: #ddd;
+  }
+
+  .main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .tabbar {
+    height: 34px; background: #252526; display: flex; align-items: center;
+    border-bottom: 1px solid #171717; flex: none;
+  }
+  .tab {
+    height: 34px; padding: 0 14px; display: flex; align-items: center;
+    background: #1e1e1e; color: #fff; border-right: 1px solid #171717;
+    font-size: 12px; gap: 6px;
+  }
+  .tab .dot { color: #4ec9b0; }
+  .editor-wrap { flex: 1; min-height: 0; position: relative; }
+  #editor { position: absolute; inset: 0; }
+  #editor textarea.fallback {
+    width: 100%; height: 100%; border: 0; outline: 0; resize: none;
+    background: #1e1e1e; color: #d4d4d4; padding: 12px;
+    font: 14px/1.5 ui-monospace, Consolas, monospace;
+  }
+
+  .bottom {
+    height: 255px; flex: none; display: flex; flex-direction: column;
+    background: #1e1e1e; border-top: 1px solid #171717;
+  }
+  .bottom.collapsed { height: 34px; }
+  .bottom.collapsed .panel-body { display: none !important; }
+  .panel-tabs {
+    height: 34px; flex: none; display: flex; align-items: center; gap: 2px;
+    background: #252526; border-bottom: 1px solid #171717; padding: 0 6px;
+  }
+  .panel-tab {
+    background: transparent; border: 0; border-bottom: 2px solid transparent;
+    color: #9a9a9a; padding: 7px 10px; font-size: 12px; cursor: pointer;
+  }
+  .panel-tab:hover { color: #ddd; }
+  .panel-tab.active { color: #fff; border-bottom-color: #007acc; }
+  .panel-tab .badge {
+    display: inline-block; min-width: 16px; padding: 0 4px; margin-left: 5px;
+    border-radius: 8px; background: #a1260d; color: #fff; font-size: 10px;
+    line-height: 15px; text-align: center;
+  }
+  .panel-body {
+    flex: 1; overflow: auto; margin: 0; padding: 10px 14px;
+    font: 12.5px/1.55 ui-monospace, SFMono-Regular, Consolas, monospace;
+    white-space: pre-wrap; color: #d4d4d4;
+  }
+  .panel-body.error { color: #f48771; }
+  .panel-body.muted { color: #7a7a7a; }
+
+  #pane-term {
+    display: flex; flex-direction: column; padding: 0; overflow: hidden;
+  }
+  .term-output {
+    flex: 1; min-height: 0; overflow: auto; margin: 0; padding: 10px 14px;
+    font: 12.5px/1.55 ui-monospace, SFMono-Regular, Consolas, monospace;
+    white-space: pre-wrap; color: #d4d4d4;
+  }
+  .term-output .note { color: #8a8a8a; }
+  .term-output .echo { color: #9cdcfe; }
+  .term-input {
+    flex: none; display: flex; align-items: center; gap: 8px;
+    padding: 6px 10px; border-top: 1px solid #2a2a2a; background: #252526;
+  }
+  .term-input .prompt {
+    color: #4ec9b0; font: 600 14px ui-monospace, monospace; padding-left: 2px;
+  }
+  .term-input input {
+    flex: 1; min-width: 0; background: #1e1e1e; border: 1px solid #3a3d41;
+    color: #e6e6e6; border-radius: 3px; padding: 5px 8px;
+    font: 12.5px ui-monospace, Consolas, monospace; outline: none;
+  }
+  .term-input input:focus { border-color: #007acc; }
+  .term-input input:disabled { opacity: .45; }
+  .term-input button { padding: 4px 9px; }
+
+  .statusbar {
+    height: 24px; flex: none; background: #007acc; color: #fff;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 12px; font-size: 11px;
+  }
+  .statusbar.error { background: #a1260d; }
+  .statusbar.warn { background: #8a6d00; }
+  .statusbar.ok { background: #16825d; }
+
+  .banner {
+    background: #5a1d1d; color: #f4c7c7; padding: 7px 14px; font-size: 12px;
+    border-bottom: 1px solid #3a1010;
+  }
+  .banner code { color: #fff; }
+
+  @media (max-width: 720px) {
+    .sidebar { display: none; }
+    .brand small { display: none; }
+    .bottom { height: 210px; }
+  }
+</style>
+</head>
+<body>
+<div class="titlebar">
+  <span class="brand">◈ DOC Script<small>linguagem natural procedural</small></span>
+  <span class="spacer"></span>
+  <a class="course-nav" href="/curso/">Curso</a>
+  <button id="btn-run" class="primary" title="Ctrl+Enter">▶ Executar</button>
+  <button id="btn-emit" title="Gera o C sem executar">⚙ Gerar C</button>
+  <button id="btn-download" class="ghost" title="Baixa o C gerado">⤓ .c</button>
+  <button id="btn-clear" class="ghost" title="Limpa o terminal e os painéis">⌫ Limpar</button>
+</div>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="sidehead">Explorador</div>
+    <div class="file">▤ &nbsp;exemplo.ln</div>
+    <div class="sidehead">Terminal</div>
+    <div class="hint">
+      Clique em <b>Executar</b>. O programa roda no painel inferior e a saída
+      aparece em tempo real.
+    </div>
+    <div class="hint">
+      Quando o programa pedir um valor com <code>Leia</code>, digite uma linha
+      e pressione <b>Enter</b>.
+    </div>
+    <div class="sidehead">Atalhos</div>
+    <div class="hint"><kbd>Ctrl</kbd> + <kbd>Enter</kbd> executa</div>
+    <div class="hint"><kbd>↑</kbd> / <kbd>↓</kbd> histórico de entrada</div>
+  </aside>
+
+  <main class="main">
+    <div id="offline-banner" class="banner" hidden>
+      Esta página foi aberta como arquivo local. Inicie <code>./docscript serve</code>
+      e acesse <code>http://127.0.0.1:8080/</code> para compilar e executar.
+    </div>
+
+    <div class="tabbar"><div class="tab"><span class="dot">●</span> exemplo.ln</div></div>
+    <div class="editor-wrap"><div id="editor"></div></div>
+
+    <section class="bottom" id="bottom">
+      <div class="panel-tabs">
+        <button class="panel-tab active" data-pane="term">Terminal</button>
+        <button class="panel-tab" data-pane="c">C gerado</button>
+        <button class="panel-tab" data-pane="diag">Diagnósticos<span class="badge" id="diag-badge" hidden>!</span></button>
+        <span class="spacer"></span>
+        <button class="ghost" id="btn-toggle" title="Recolher painel">▾</button>
+      </div>
+
+      <div class="panel-body" id="pane-term">
+        <pre class="term-output" id="terminal">Pressione ▶ Executar para iniciar o programa.
+A saída aparecerá aqui e você poderá digitar as entradas quando o programa pedir.
+</pre>
+        <div class="term-input">
+          <span class="prompt">›</span>
+          <input id="term-line" type="text" autocomplete="off" spellcheck="false"
+                 placeholder="Digite uma linha e pressione Enter" disabled>
+          <button id="btn-stop" disabled title="Interrompe o programa">■ Parar</button>
+        </div>
+      </div>
+
+      <pre class="panel-body muted" id="pane-c">O código C gerado aparecerá aqui.</pre>
+      <pre class="panel-body muted" id="pane-diag">Sem diagnósticos.</pre>
+    </section>
+
+    <div class="statusbar" id="statusbar">
+      <span id="status">Pronto</span>
+      <span id="meta">LN Procedural · UTF-8</span>
+    </div>
+  </main>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.6/ace.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  var STORAGE_CODE = "docscript.code";
+  var TERMINAL_LIMIT = 200000;
+
+  var DEFAULT_CODE = [
+    'Programa "AnaliseElegibilidade".',
+    "",
+    "Variaveis",
+    "    idade: Inteiro.",
+    "    renda: Real.",
+    "    possui_documentos: Logico.",
+    "    elegivel: Logico.",
+    "",
+    "Inicio",
+    "    (Recebe os dados do candidato.)",
+    '    Escreva "Idade: ".',
+    "    Leia idade.",
+    "",
+    '    Escreva "Renda mensal: ".',
+    "    Leia renda.",
+    "",
+    '    Escreva "Possui documentos? (1 para sim, 0 para nao): ".',
+    "    Leia possui_documentos.",
+    "",
+    "    (Avalia os criterios de elegibilidade.)",
+    "    Se idade >= 18 e renda >= 1200 e possui_documentos = verdadeiro entao.",
+    "        elegivel <- verdadeiro.",
+    "    Senao.",
+    "        elegivel <- falso.",
+    "    FimSe.",
+    "",
+    "    (Apresenta o resultado.)",
+    "    Se elegivel = verdadeiro entao.",
+    '        Escreva "Candidato elegivel".',
+    "    Senao.",
+    '        Escreva "Candidato nao elegivel".',
+    "    FimSe.",
+    "Fim."
+  ].join("\n");
+
+  var editorEl = document.getElementById("editor");
+  var terminalEl = document.getElementById("terminal");
+  var termLine = document.getElementById("term-line");
+  var btnStop = document.getElementById("btn-stop");
+  var statusbar = document.getElementById("statusbar");
+  var statusEl = document.getElementById("status");
+  var metaEl = document.getElementById("meta");
+  var bottom = document.getElementById("bottom");
+  var diagBadge = document.getElementById("diag-badge");
+  var panes = {
+    term: document.getElementById("pane-term"),
+    c: document.getElementById("pane-c"),
+    diag: document.getElementById("pane-diag")
+  };
+
+  var editor = null;
+  var busy = false;
+  var sessionId = null;
+  var eventSource = null;
+  var running = false;
+  var history = [];
+  var historyIndex = 0;
+  var termChars = 0;
+
+  function setStatus(text, kind) {
+    statusEl.textContent = text;
+    statusbar.className = "statusbar" + (kind ? " " + kind : "");
+  }
+
+  function showPane(name) {
+    Object.keys(panes).forEach(function (key) {
+      panes[key].style.display = key === name ? "" : "none";
+    });
+    Array.prototype.forEach.call(
+      document.querySelectorAll(".panel-tab"),
+      function (tab) {
+        tab.classList.toggle("active", tab.dataset.pane === name);
+      }
+    );
+    bottom.classList.remove("collapsed");
+  }
+
+  function setPane(name, text, kind) {
+    var pane = panes[name];
+    pane.textContent = text;
+    pane.className = "panel-body" + (kind ? " " + kind : "");
+  }
+
+  function termClear() {
+    terminalEl.textContent = "";
+    termChars = 0;
+  }
+
+  function termAppend(text, cls) {
+    if (!text) {
+      return;
+    }
+    var span = document.createElement("span");
+    if (cls) {
+      span.className = cls;
+    }
+    span.textContent = text;
+    terminalEl.appendChild(span);
+    termChars += text.length;
+    while (termChars > TERMINAL_LIMIT && terminalEl.firstChild) {
+      var first = terminalEl.firstChild;
+      termChars -= (first.textContent || "").length;
+      terminalEl.removeChild(first);
+    }
+    terminalEl.scrollTop = terminalEl.scrollHeight;
+  }
+
+  function termNote(text) {
+    termAppend("[docscript] " + text + "\n", "note");
+  }
+
+  function initEditor(initialCode) {
+    if (window.ace) {
+      ace.define("ace/mode/ln_highlight_rules",
+        ["require", "exports", "module", "ace/lib/oop",
+         "ace/mode/text_highlight_rules"],
+        function (require, exports) {
+          var oop = require("ace/lib/oop");
+          var TextRules =
+            require("ace/mode/text_highlight_rules").TextHighlightRules;
+          var Rules = function () {
+            this.$rules = {
+              start: [
+                { token: "comment", regex: "\\([^()]*\\)" },
+                { token: "keyword.import", regex: "\\bArquivos:" },
+                { token: "string", regex: '"(?:\\\\.|[^"\\\\])*"' },
+                { token: "constant.numeric", regex: "\\b\\d+(?:\\.\\d+)?\\b" },
+                { token: "constant.language",
+                  regex: "\\b(?:verdadeiro|falso)\\b" },
+                { token: "keyword.control",
+                  regex: "\\b(?:Programa|Inicio|Fim|Se|Senao|FimSe|entao|Leia|Escreva)\\b" },
+                { token: "storage.type",
+                  regex: "\\b(?:Variaveis|Inteiro|Real|Logico|Texto)\\b" },
+                { token: "keyword.operator",
+                  regex: "<-|>=|<=|==|!=|[=<>+*/-]|\\b(?:e|ou|nao)\\b" },
+                { token: "punctuation", regex: "[.:,]" },
+                { token: "identifier",
+                  regex: "[A-Za-zÀ-ÿ_][A-Za-zÀ-ÿ_0-9]*" }
+              ]
+            };
+            this.normalizeRules();
+          };
+          oop.inherits(Rules, TextRules);
+          exports.LNHighlightRules = Rules;
+        });
+
+      ace.define("ace/mode/ln",
+        ["require", "exports", "module", "ace/lib/oop", "ace/mode/text",
+         "ace/mode/ln_highlight_rules"],
+        function (require, exports) {
+          var oop = require("ace/lib/oop");
+          var TextMode = require("ace/mode/text").Mode;
+          var Rules = require("ace/mode/ln_highlight_rules").LNHighlightRules;
+          var Mode = function () { this.HighlightRules = Rules; };
+          oop.inherits(Mode, TextMode);
+          Mode.prototype.$id = "ace/mode/ln";
+          exports.Mode = Mode;
+        });
+
+      editor = ace.edit(editorEl);
+      editor.setTheme("ace/theme/tomorrow_night");
+      editor.session.setMode("ace/mode/ln");
+      editor.setOptions({
+        fontSize: "14px",
+        showPrintMargin: false,
+        tabSize: 4,
+        useSoftTabs: true,
+        wrap: true,
+        highlightActiveLine: true
+      });
+      editor.setValue(initialCode, -1);
+      editor.on("change", function () {
+        try { localStorage.setItem(STORAGE_CODE, editor.getValue()); } catch (e) {}
+      });
+      editor.commands.addCommand({
+        name: "executar",
+        bindKey: { win: "Ctrl-Enter", mac: "Command-Enter" },
+        exec: function () { runProgram(); }
+      });
+    } else {
+      editorEl.innerHTML = "";
+      var textarea = document.createElement("textarea");
+      textarea.className = "fallback";
+      textarea.spellcheck = false;
+      textarea.value = initialCode;
+      editorEl.appendChild(textarea);
+      textarea.addEventListener("input", function () {
+        try { localStorage.setItem(STORAGE_CODE, textarea.value); } catch (e) {}
+      });
+      editor = {
+        getValue: function () { return textarea.value; },
+        setValue: function (value) { textarea.value = value; },
+        focus: function () { textarea.focus(); }
+      };
+      metaEl.textContent = "LN Procedural · modo simples (Ace indisponível)";
+    }
+  }
+
+  function readStored(key) {
+    try { return localStorage.getItem(key); } catch (e) { return null; }
+  }
+
+  function resetSession() {
+    if (sessionId) {
+      fetch("/api/session/" + sessionId + "/stop", { method: "POST" })
+        .catch(function () {});
+    }
+    if (eventSource) {
+      eventSource.close();
+      eventSource = null;
+    }
+    sessionId = null;
+    running = false;
+    termLine.disabled = true;
+    btnStop.disabled = true;
+  }
+
+  function finishSession(payload) {
+    if (eventSource) {
+      eventSource.close();
+      eventSource = null;
+    }
+    var wasRunning = running;
+    sessionId = null;
+    running = false;
+    termLine.disabled = true;
+    btnStop.disabled = true;
+
+    if (payload) {
+      if (payload.timedOut) {
+        termNote("tempo limite de 60s atingido; processo encerrado.");
+        setStatus("Tempo limite", "error");
+      } else if (payload.stopped) {
+        termNote("execução interrompida.");
+        setStatus("Interrompido", "warn");
+      } else {
+        termNote("processo finalizado com código " + payload.code + ".");
+        setStatus("Finalizado (código " + payload.code + ")",
+                  payload.code === 0 ? "ok" : "warn");
+      }
+    } else if (wasRunning) {
+      setStatus("Sessão encerrada", "warn");
+    }
+  }
+
+  function openStream() {
+    if (!sessionId) {
+      return;
+    }
+    var id = sessionId;
+    eventSource = new EventSource("/api/session/" + id + "/stream");
+
+    eventSource.addEventListener("out", function (event) {
+      var payload;
+      try { payload = JSON.parse(event.data); } catch (e) { return; }
+      termAppend(payload.text);
+    });
+
+    eventSource.addEventListener("exit", function (event) {
+      var payload = {};
+      try { payload = JSON.parse(event.data); } catch (e) {}
+      finishSession(payload);
+    });
+
+    eventSource.onerror = function () {
+      if (running && sessionId === id) {
+        termNote("conexão com o servidor foi encerrada.");
+        finishSession(null);
+      }
+    };
+  }
+
+  function sendLine(line) {
+    if (!running || !sessionId) {
+      return;
+    }
+    var id = sessionId;
+    history.push(line);
+    if (history.length > 100) {
+      history.shift();
+    }
+    historyIndex = history.length;
+    termAppend(line + "\n", "echo");
+
+    fetch("/api/session/" + id + "/input", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ data: line + "\n" })
+    }).then(function (response) {
+      if (response.ok) {
+        return null;
+      }
+      return response.json().then(function (data) {
+        termNote(data.message || ("falha ao enviar entrada (HTTP " +
+                                  response.status + ")"));
+      }).catch(function () {
+        termNote("falha ao enviar entrada (HTTP " + response.status + ")");
+      });
+    }).catch(function () {
+      termNote("falha ao enviar entrada.");
+    });
+  }
+
+  function stopSession() {
+    if (!sessionId) {
+      return;
+    }
+    var id = sessionId;
+    btnStop.disabled = true;
+    termNote("solicitando interrupção…");
+    fetch("/api/session/" + id + "/stop", { method: "POST" })
+      .catch(function () {});
+    setTimeout(function () {
+      if (running && sessionId === id) {
+        finishSession({ code: -1, stopped: true, timedOut: false });
+      }
+    }, 2500);
+  }
+
+  async function runProgram() {
+    if (busy) {
+      return;
+    }
+    resetSession();
+    busy = true;
+    document.getElementById("btn-run").disabled = true;
+    document.getElementById("btn-emit").disabled = true;
+    showPane("term");
+    termClear();
+    termNote("compilando…");
+    setStatus("Compilando…");
+
+    try {
+      var response = await fetch("/api/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: editor.getValue() })
+      });
+      if (!response.ok) {
+        throw new Error("HTTP " + response.status);
+      }
+      var data = await response.json();
+      setPane("c", data.c || "(nenhum código C gerado)",
+              data.c ? "" : "muted");
+      setPane("diag", data.diagnostics || "Sem diagnósticos.",
+              data.diagnostics ? "" : "muted");
+      diagBadge.hidden = !data.diagnostics;
+
+      if (!data.ok) {
+        termNote("falha na compilação; veja a aba Diagnósticos.");
+        showPane("diag");
+        setStatus("Erro de compilação", "error");
+        return;
+      }
+
+      sessionId = data.id;
+      running = true;
+      termClear();
+      termNote("sessão iniciada. Digite abaixo e pressione Enter.");
+      termLine.disabled = false;
+      btnStop.disabled = false;
+      termLine.focus();
+      setStatus("Executando…");
+      openStream();
+    } catch (error) {
+      termNote("não foi possível falar com o servidor: " + error.message);
+      termNote("inicie com: make && ./docscript serve");
+      setStatus("Servidor indisponível", "error");
+    } finally {
+      busy = false;
+      document.getElementById("btn-run").disabled = false;
+      document.getElementById("btn-emit").disabled = false;
+    }
+  }
+
+  async function generateC() {
+    if (busy) {
+      return;
+    }
+    busy = true;
+    document.getElementById("btn-run").disabled = true;
+    document.getElementById("btn-emit").disabled = true;
+    setStatus("Gerando código C…");
+
+    try {
+      var response = await fetch("/api/compile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: editor.getValue(), mode: "emit" })
+      });
+      if (!response.ok) {
+        throw new Error("HTTP " + response.status);
+      }
+      var data = await response.json();
+      setPane("c", data.c || "(nenhum código C gerado)",
+              data.c ? "" : "muted");
+      setPane("diag", data.diagnostics || "Sem diagnósticos.",
+              data.diagnostics ? "" : "muted");
+      diagBadge.hidden = !data.diagnostics;
+
+      if (!data.ok) {
+        showPane("diag");
+        setStatus("Erro de compilação", "error");
+      } else {
+        showPane("c");
+        setStatus("Código C gerado", "ok");
+      }
+    } catch (error) {
+      setPane("diag",
+        "Não foi possível falar com o servidor de compilação.\n\n" +
+        "No diretório do projeto, execute:\n\n" +
+        "    make\n    ./docscript serve\n\n" +
+        "Depois abra http://127.0.0.1:8080/ no navegador.\n\n" +
+        "Detalhe técnico: " + error.message, "error");
+      showPane("diag");
+      setStatus("Servidor indisponível", "error");
+    } finally {
+      busy = false;
+      document.getElementById("btn-run").disabled = false;
+      document.getElementById("btn-emit").disabled = false;
+    }
+  }
+
+  function downloadC() {
+    var text = panes.c.textContent || "";
+    if (!text || /^O código C/.test(text)) {
+      setStatus("Gere o C antes de baixar", "warn");
+      return;
+    }
+    var blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+    var url = URL.createObjectURL(blob);
+    var link = document.createElement("a");
+    link.href = url;
+    link.download = "programa.c";
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
+  document.getElementById("btn-run").addEventListener("click", runProgram);
+  document.getElementById("btn-emit").addEventListener("click", generateC);
+  document.getElementById("btn-download").addEventListener("click", downloadC);
+  document.getElementById("btn-stop").addEventListener("click", stopSession);
+  document.getElementById("btn-clear").addEventListener("click", function () {
+    termClear();
+    termNote("terminal limpo.");
+    setPane("c", "O código C gerado aparecerá aqui.", "muted");
+    setPane("diag", "Sem diagnósticos.", "muted");
+    diagBadge.hidden = true;
+    setStatus(running ? "Executando…" : "Pronto");
+  });
+  document.getElementById("btn-toggle").addEventListener("click", function () {
+    bottom.classList.toggle("collapsed");
+    this.textContent = bottom.classList.contains("collapsed") ? "▴" : "▾";
+  });
+  Array.prototype.forEach.call(
+    document.querySelectorAll(".panel-tab"),
+    function (tab) {
+      tab.addEventListener("click", function () { showPane(tab.dataset.pane); });
+    }
+  );
+
+  termLine.addEventListener("keydown", function (event) {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      var line = termLine.value;
+      termLine.value = "";
+      sendLine(line);
+    } else if (event.key === "ArrowUp") {
+      if (history.length === 0) {
+        return;
+      }
+      event.preventDefault();
+      historyIndex = Math.max(0, historyIndex - 1);
+      termLine.value = history[historyIndex] || "";
+    } else if (event.key === "ArrowDown") {
+      if (history.length === 0) {
+        return;
+      }
+      event.preventDefault();
+      historyIndex = Math.min(history.length, historyIndex + 1);
+      termLine.value = history[historyIndex] || "";
+    }
+  });
+
+  document.addEventListener("keydown", function (event) {
+    if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
+      event.preventDefault();
+      runProgram();
+    }
+  });
+
+  var storedCode = readStored(STORAGE_CODE);
+  initEditor(storedCode !== null ? storedCode : DEFAULT_CODE);
+  showPane("term");
+
+  if (location.protocol === "file:") {
+    document.getElementById("offline-banner").hidden = false;
+    setStatus("Abra pelo servidor local para compilar", "warn");
+  } else {
+    fetch("/exemplo.ln")
+      .then(function (response) { return response.ok ? response.text() : null; })
+      .then(function (text) {
+        if (text && readStored(STORAGE_CODE) === null) {
+          editor.setValue(text, -1);
+        }
+      })
+      .catch(function () {});
+  }
+
+  editor.focus();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f4ef">
+  <title>Curso de DOC Script</title>
+  <link rel="stylesheet" href="/curso/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/curso/" aria-label="Curso de DOC Script, início">
+      <span class="brand-mark">D</span>
+      <span><strong>DOC Script</strong><small>Curso interativo</small></span>
+    </a>
+    <div class="top-progress" aria-live="polite">
+      <span id="progress-label">0 de 10 aulas concluídas</span>
+      <span class="progress-track"><span id="progress-fill"></span></span>
+    </div>
+    <button id="menu-toggle" class="menu-toggle" type="button" aria-label="Mostrar aulas" aria-expanded="false">☰</button>
+  </header>
+
+  <div class="app-shell">
+    <aside id="sidebar" class="sidebar" aria-label="Navegação do curso">
+      <div class="sidebar-heading">SEU PERCURSO</div>
+      <div id="lesson-nav"></div>
+      <div class="sidebar-note">
+        <span class="note-icon">⌘</span>
+        <p>Aprenda programação construindo ideias, uma aula de cada vez.</p>
+      </div>
+    </aside>
+
+    <main class="workspace">
+      <section class="lesson-column">
+        <div class="breadcrumbs"><span>CURSO</span><span class="crumb-slash">/</span><span id="crumb-module">PRIMEIROS PASSOS</span></div>
+        <div class="lesson-heading">
+          <div>
+            <div class="lesson-meta"><span id="lesson-number">AULA 01</span><span class="meta-dot">·</span><span id="lesson-duration">5 MIN</span></div>
+            <h1 id="lesson-title">Olá, programa!</h1>
+          </div>
+          <button id="complete-button" class="complete-button" type="button">Marcar como concluída</button>
+        </div>
+        <div id="lesson-content" class="lesson-content"></div>
+        <div class="lesson-footer">
+          <button id="previous-button" class="secondary-button" type="button">← Aula anterior</button>
+          <button id="next-button" class="primary-button" type="button">Próxima aula <span>→</span></button>
+        </div>
+      </section>
+
+      <aside class="practice-column" aria-label="Editor de código">
+        <div class="practice-heading">
+          <div>
+            <span class="practice-kicker">MÃO NA MASSA</span>
+            <h2>Experimente o código</h2>
+          </div>
+          <span class="live-pill"><i></i> DOC SCRIPT</span>
+        </div>
+        <div class="editor-card">
+          <div class="editor-toolbar">
+            <span class="file-tab"><span class="file-dot">●</span> programa.ln</span>
+            <button id="reset-button" class="text-button" type="button" title="Restaurar o código inicial">Restaurar</button>
+          </div>
+          <div class="code-wrap">
+            <div id="line-numbers" class="line-numbers" aria-hidden="true"></div>
+            <textarea id="code-editor" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Código DOC Script" wrap="off"></textarea>
+          </div>
+          <div class="input-area">
+            <label for="stdin-input"><span>ENTRADA DO PROGRAMA</span><small>Valores para cada <code>leia</code></small></label>
+            <textarea id="stdin-input" rows="2" spellcheck="false" aria-label="Entrada padrão do programa" placeholder="Ex.: 18&#10;42"></textarea>
+          </div>
+          <div class="run-row">
+            <button id="run-button" class="run-button" type="button"><span class="play-icon">▶</span> Executar código</button>
+            <span class="shortcut">Ctrl + Enter</span>
+          </div>
+        </div>
+
+        <div class="output-card">
+          <div class="output-heading"><span>RESULTADO</span><span id="run-status" class="run-status">Pronto para executar</span></div>
+          <pre id="program-output" class="program-output">A saída do programa aparecerá aqui.</pre>
+        </div>
+        <div class="api-note"><span>●</span> O código roda no compilador local do DOC Script.</div>
+      </aside>
+    </main>
+  </div>
+  <script src="/curso/app.js" defer></script>
+</body>
+</html>

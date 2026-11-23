@@ -276,6 +276,10 @@ cd linguagem-natural
 
 Os exemplos também podem ser copiados para o editor local iniciado por `./docscript serve`. Consulte [`linguagem-natural/exemplos-docscript/README.md`](linguagem-natural/exemplos-docscript/README.md) para a lista completa e os comandos para cada arquivo.
 
+### 4.6 Curso interativo
+
+Um curso de programação com dez aulas, editor e execução integrada está em [`linguagem-natural/curso/`](linguagem-natural/curso/). Para abri-lo, inicie `./docscript serve` dentro de `linguagem-natural` e acesse <http://127.0.0.1:8080/curso/>. Consulte o [guia do curso](linguagem-natural/curso/README.md) para os controles e o fluxo de uso.
+
 ## 5. Diagnósticos e experiência de aprendizagem
 
 Os erros são apresentados com categoria, localização, token encontrado, expectativa, explicação e orientação:
