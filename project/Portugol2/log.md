@@ -12,3 +12,4 @@
 - Commit `98eac89` (`Completa expectativas dos testes Portugol`) criado e enviado para `origin/main`.
 - A publicação incluiu somente os sete arquivos da etapa; alterações preexistentes em `Dockerfile` e `find.sh` permaneceram fora.
 - Próximo passo: verificar se há outras lacunas na implementação Portugol.
+- Iniciado o servidor local do editor: `./docscript serve --host 127.0.0.1 --port 8080`. Endereço: http://127.0.0.1:8080/.
