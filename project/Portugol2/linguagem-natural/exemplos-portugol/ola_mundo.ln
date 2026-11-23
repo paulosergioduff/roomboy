@@ -1,5 +1,6 @@
 programa "OlaMundo" {
     funcao inicio {
+        (Mostra uma mensagem simples na tela.)
         escreval "Ola, mundo!"
     }
 }

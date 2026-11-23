@@ -1,0 +1,23 @@
+programa "PortugolBasico" {
+    funcao inicio {
+        (Comentarios entre parenteses tambem sao aceitos neste dialeto.)
+        inteiro idade = 20
+        inteiro resto = 7 % 2
+        cadeia nome = "Ana"
+        logico autorizado = verdadeiro
+
+        escreval "Nome: ", nome
+        escreval "Idade: ", idade
+        escreval "Resto: ", resto
+
+        se idade >= 18 e autorizado {
+            escreval "maior"
+        } senao {
+            escreval "menor"
+        }
+
+        se nao autorizado {
+            escreval "negado"
+        }
+    }
+}

@@ -19,3 +19,6 @@
 - Validação: os cinco programas executaram e corresponderam aos respectivos `.out`; `make test` terminou com 34 aprovados e 0 falhas.
 - Commit `6eaed6c` (`Adiciona exemplos da sintaxe Portugol`) enviado para `origin/main`.
 - Os executáveis gerados durante o teste não foram incluídos no commit; a revisão automática bloqueou a remoção deles do workspace local.
+- Confirmado no tokenizador: comentários entre parênteses são descartados antes do parser nos dois dialetos.
+- Adicionados comentários em parênteses a cada exemplo Portugol e ao caso golden `portugol_basico.ln`; documentada a regra compartilhada.
+- Revalidação: C gerado e saídas dos cinco exemplos permaneceram idênticos; `make test` passou com 34 aprovados e 0 falhas.

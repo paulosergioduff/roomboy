@@ -18,7 +18,7 @@ O compilador atual é escrito em C e traduz um subconjunto procedural para C, ch
 
 ### 2.1 Comentários
 
-Comentários são delimitados por parênteses. O conteúdo entre `(` e `)` não é executado nem traduzido como instrução.
+Comentários são delimitados por parênteses nos dois dialetos do compilador. O tokenizador remove o conteúdo entre `(` e `)` antes de chamar o parser, então ele não é executado nem traduzido como instrução.
 
 ```text
 (Recebe os dados do candidato.)

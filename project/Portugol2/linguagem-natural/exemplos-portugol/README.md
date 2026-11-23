@@ -2,6 +2,8 @@
 
 Os arquivos desta pasta usam o dialeto Portugol aceito pelo DOC Script. Eles estão organizados do exemplo mais simples para os que usam entrada, decisões e laços.
 
+Comentários nos dois dialetos são escritos entre parênteses. O tokenizador os remove antes do parser; por exemplo: `(Lê um valor.)`. Todo comentário precisa ser fechado e comentários aninhados não são aceitos.
+
 ## Requisitos
 
 Compile o DOC Script uma vez, a partir da pasta `linguagem-natural`:

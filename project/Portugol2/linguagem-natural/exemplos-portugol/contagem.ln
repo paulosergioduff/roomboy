@@ -5,6 +5,7 @@ programa "Contagem" {
         escreva "Contar ate: "
         leia limite
 
+        (Conta do primeiro numero ate o limite informado.)
         para inteiro numero = 1; numero <= limite; numero++ {
             escreval numero
         }
