@@ -1,0 +1,14 @@
+programa "ParOuImpar" {
+    funcao inicio {
+        inteiro numero
+
+        escreva "Digite um numero inteiro: "
+        leia numero
+
+        se numero % 2 = 0 {
+            escreval "Par"
+        } senao {
+            escreval "Impar"
+        }
+    }
+}

@@ -1,0 +1,12 @@
+programa "Contagem" {
+    funcao inicio {
+        inteiro limite
+
+        escreva "Contar ate: "
+        leia limite
+
+        para inteiro numero = 1; numero <= limite; numero++ {
+            escreval numero
+        }
+    }
+}

@@ -13,3 +13,8 @@
 - A publicação incluiu somente os sete arquivos da etapa; alterações preexistentes em `Dockerfile` e `find.sh` permaneceram fora.
 - Próximo passo: verificar se há outras lacunas na implementação Portugol.
 - Iniciado o servidor local do editor: `./docscript serve --host 127.0.0.1 --port 8080`. Endereço: http://127.0.0.1:8080/.
+- Criados cinco exemplos em `linguagem-natural/exemplos-portugol/`: Olá mundo, média, par ou ímpar, tabuada e contagem.
+- Documentados os comandos de build, análise, geração de C, execução com arquivos `.in`, comparação com `.out` e uso pelo editor.
+- Observado e documentado que o parser ainda não permite parênteses para agrupar expressões; o exemplo da média foi escrito sem agrupamento.
+- Validação: os cinco programas executaram e corresponderam aos respectivos `.out`; `make test` terminou com 34 aprovados e 0 falhas.
+- Próximo passo: revisar e publicar os arquivos dos exemplos e documentação.

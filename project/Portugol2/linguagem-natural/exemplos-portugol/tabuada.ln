@@ -1,0 +1,11 @@
+programa "Tabuada" {
+    funcao inicio {
+        inteiro numero = 5
+        inteiro multiplicador = 1
+
+        enquanto multiplicador <= 10 {
+            escreval numero, " x ", multiplicador, " = ", numero * multiplicador
+            multiplicador = multiplicador + 1
+        }
+    }
+}

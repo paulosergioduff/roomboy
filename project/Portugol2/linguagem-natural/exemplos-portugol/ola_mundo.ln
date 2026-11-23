@@ -1,0 +1,5 @@
+programa "OlaMundo" {
+    funcao inicio {
+        escreval "Ola, mundo!"
+    }
+}

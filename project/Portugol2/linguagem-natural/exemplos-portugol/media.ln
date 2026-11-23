@@ -1,0 +1,15 @@
+programa "Media" {
+    funcao inicio {
+        real nota1
+        real nota2
+        real media
+
+        escreva "Primeira nota: "
+        leia nota1
+        escreva "Segunda nota: "
+        leia nota2
+
+        media = nota1 / 2.0 + nota2 / 2.0
+        escreval "Media: ", media
+    }
+}
