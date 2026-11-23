@@ -37,4 +37,4 @@
 - `make test`: 36 passaram, 0 falharam; `node --check curso/app.js` passou.
 - Verificados os assets HTTP do editor e do curso e executados pela API os dez códigos iniciais (todos com código de saída 0).
 - Servidor local mantido ativo em http://127.0.0.1:8080/ para o usuário testar.
-- Próximo passo: revisar e publicar esta etapa.
+- Commit `4b92206` (`Adiciona curso interativo de DOC Script`) enviado para `origin/main`.
