@@ -1,0 +1,5 @@
+programa "NaoDeclarada" {
+    funcao inicio {
+        escreval idade
+    }
+}

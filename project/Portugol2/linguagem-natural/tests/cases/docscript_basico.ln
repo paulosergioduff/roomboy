@@ -1,4 +1,4 @@
-programa "PortugolBasico" {
+programa "DocScriptBasico" {
     funcao inicio {
         (Comentarios entre parenteses tambem sao aceitos neste dialeto.)
         inteiro idade = 20

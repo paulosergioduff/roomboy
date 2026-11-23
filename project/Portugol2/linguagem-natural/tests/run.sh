@@ -61,6 +61,33 @@ for ln in "$ROOT"/tests/cases/*.ln; do
     fi
 done
 
+echo "== Arquivo C opcional =="
+cp "$ROOT/tests/cases/ola.ln" "$TMP/preservacao.ln"
+if "$BIN" run "$TMP/preservacao.ln" --exe "$TMP/preservacao" --quiet \
+    >"$TMP/preservacao.out" 2>"$TMP/preservacao.err"; then
+    if [ -e "$TMP/preservacao.c" ]; then
+        bad "C intermediário foi salvo sem --save-c"
+    else
+        ok
+    fi
+else
+    bad "compilação padrão sem arquivo C"
+    cat "$TMP/preservacao.err"
+fi
+
+if "$BIN" run "$TMP/preservacao.ln" --exe "$TMP/preservacao-salva" \
+    --save-c --quiet >"$TMP/preservacao-save.out" \
+    2>"$TMP/preservacao-save.err"; then
+    if [ -f "$TMP/preservacao.c" ]; then
+        ok
+    else
+        bad "--save-c não preservou o C gerado"
+    fi
+else
+    bad "compilação com --save-c"
+    cat "$TMP/preservacao-save.err"
+fi
+
 echo "== Diagnósticos de erro =="
 for ln in "$ROOT"/tests/errors/*.ln; do
     name="$(basename "$ln" .ln)"

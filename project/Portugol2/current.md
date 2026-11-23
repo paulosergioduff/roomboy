@@ -1,9 +1,9 @@
 # Estado atual
 
-Objetivo: conferir a integração da sintaxe Portugol, concluir o que estiver pendente, verificar o funcionamento e publicar as etapas concluídas.
+Objetivo: manter o DOC Script documentado e testado, com publicação por etapas.
 
-Situação: a implementação já contém dois dialetos. DOC Script usa palavras em português e sintaxe própria; o dialeto Portugol usa `programa`, `funcao inicio`, chaves, `leia`/`escreva`/`escreval`, condicionais e laços. Comentários nos dois dialetos usam parênteses e são removidos pelo tokenizador antes do parser. A pasta `linguagem-natural/exemplos-portugol/` reúne cinco exemplos comentados, com instruções, entradas e saídas esperadas. Todos os exemplos passaram por compilação, execução e comparação com seus `.out`; `make test` também passou (34 aprovados, 0 falhas). O servidor do editor está ativo em `http://127.0.0.1:8080/`.
+Situação: o compilador gera o executável sem gravar C intermediário no projeto por padrão. `--save-c`, `-o`/`--output` e o comando explícito `emit` preservam/geram o arquivo C. Os exemplos próprios do DOC Script estão em `linguagem-natural/exemplos-docscript/`. Comentários entre parênteses são retirados pelo tokenizador antes do parser. Os C gerados mantidos na pasta de exemplos e o antigo `exemplo.c` foram removidos; snapshots C da suíte continuam como fixtures de teste. Build, compilação padrão, preservação opcional, `-c`, geração explícita, cinco exemplos e suíte foram validados.
 
-Última ação: commit `1e68b49` (`Documenta comentarios entre parenteses`) enviado para `origin/main`. Comentários entre parênteses são descartados pelo tokenizador antes do parser nos dois dialetos; os cinco exemplos Portugol e um caso golden agora demonstram essa regra. C e saídas mantiveram-se iguais, e `make test` passou (34 aprovados, 0 falhas).
+Última ação: validei `make test` (36 aprovados, 0 falhas), todos os cinco exemplos com suas saídas e os modos `--save-c`, `--output`, `emit` e `-c`. A compilação padrão não deixou arquivo `.c`; removi o exemplo gerado antigo e os `.c` gerados da pasta de exemplos. Ainda não commitei nem publiquei esta etapa.
 
-Próxima ação: usar os exemplos documentados em `linguagem-natural/exemplos-portugol/`.
+Próxima ação: revisar diff, atualizar mensagens de commit publicadas para remover a referência nominal à inspiração e publicar depois da validação já realizada.

@@ -9,7 +9,7 @@ O compilador atual é escrito em C e traduz um subconjunto procedural para C, ch
 - A sintaxe utiliza palavras-chave em português.
 - A linguagem é compilada: o código DOC Script é analisado e traduzido para uma linguagem de destino.
 - O primeiro backend é C.
-- O código C gerado deve ser preservado como artefato de compilação, mesmo quando a geração do executável for automatizada.
+- O C gerado pode ser preservado quando solicitado, sem obrigar cada compilação a criar um arquivo intermediário no projeto.
 - O compilador deve apresentar erros claros, com localização e explicações úteis para quem está aprendendo.
 - A linguagem deve ser compreensível tanto por pessoas quanto por ferramentas de IA, sem depender de uma LLM para definir a semântica ou executar o programa.
 - A arquitetura deve permitir backends e módulos futuros, sem exigir que todos os recursos das linguagens de destino sejam reimplementados no núcleo.
@@ -168,7 +168,7 @@ Verificações semânticas não bloqueantes (src/semantic.c)
         v
 Backend C (src/codegen.c)
         |
-        +----> Código C preservado (.c)
+        +----> Arquivo C opcional (--save-c)
         |
         v
 Compilador C (cc/gcc, configurável)
@@ -177,7 +177,7 @@ Compilador C (cc/gcc, configurável)
 Executável nativo
 ```
 
-O comando principal executa o fluxo completo, preserva o arquivo `.c` mesmo quando a compilação C falha e repassa a saída do compilador C ao usuário.
+O comando principal executa o fluxo completo. Por padrão, o C intermediário fica em um arquivo temporário e é removido após a compilação. Use `--save-c` para preservá-lo ao lado do fonte, ou `-o`/`--output` para escolher o caminho. O comando `emit` continua gerando C explicitamente.
 
 ### 4.2 Organização do código
 
@@ -199,8 +199,9 @@ O comando principal executa o fluxo completo, preserva o arquivo `.c` mesmo quan
 
 ```bash
 make                              # compila o binário ./docscript
-./docscript exemplo.ln            # gera exemplo.c e o executável exemplo
+./docscript exemplo.ln            # gera o executável exemplo, sem salvar C no projeto
 ./docscript run exemplo.ln        # compila e executa
+./docscript exemplo.ln --save-c   # também preserva exemplo.c
 ./docscript emit exemplo.ln -o exemplo.c   # gera apenas o C
 ./docscript check exemplo.ln      # apenas analisa (tokeniza e parseia)
 make test                         # executa a suíte de testes
@@ -209,7 +210,8 @@ make test                         # executa a suíte de testes
 Opções principais:
 
 ```text
--o, --output <arquivo.c>   caminho do C gerado
+    --save-c                preserva o C gerado como <fonte>.c
+-o, --output <arquivo.c>   caminho para salvar o C (ativa a preservação)
     --exe <arquivo>        caminho do executável
     --cc <compilador>      compilador C (padrão: $CC ou cc)
 -c, --only-c               não chama o compilador C
@@ -262,17 +264,17 @@ Corpo de `/api/compile`:
 
 O servidor compila cada requisição em um diretório temporário e aplica tempo limite de 5 segundos à execução do programa do usuário. Ele é destinado ao uso local e não deve ser exposto publicamente.
 
-### 4.5 Exemplos no dialeto Portugol
+### 4.5 Exemplos de DOC Script
 
-Os programas de demonstração do dialeto Portugol estão em [`linguagem-natural/exemplos-portugol/`](linguagem-natural/exemplos-portugol/), com instruções de uso, arquivos de entrada e saídas de referência. Compile primeiro com `make` na pasta `linguagem-natural`; em seguida, por exemplo:
+Os programas de demonstração do DOC Script estão em [`linguagem-natural/exemplos-docscript/`](linguagem-natural/exemplos-docscript/), com instruções de uso, arquivos de entrada e saídas de referência. Compile primeiro com `make` na pasta `linguagem-natural`; em seguida, por exemplo:
 
 ```bash
 cd linguagem-natural
-./docscript run exemplos-portugol/ola_mundo.ln
-./docscript run exemplos-portugol/media.ln < exemplos-portugol/media.in
+./docscript run exemplos-docscript/ola_mundo.ln
+./docscript run exemplos-docscript/media.ln < exemplos-docscript/media.in
 ```
 
-Os exemplos também podem ser copiados para o editor local iniciado por `./docscript serve`. Consulte [`linguagem-natural/exemplos-portugol/README.md`](linguagem-natural/exemplos-portugol/README.md) para a lista completa e os comandos para cada arquivo.
+Os exemplos também podem ser copiados para o editor local iniciado por `./docscript serve`. Consulte [`linguagem-natural/exemplos-docscript/README.md`](linguagem-natural/exemplos-docscript/README.md) para a lista completa e os comandos para cada arquivo.
 
 ## 5. Diagnósticos e experiência de aprendizagem
 
@@ -327,7 +329,7 @@ O destaque de sintaxe não substitui a validação do compilador.
 
 O arquivo `exemplo.ln` contém um programa procedural de análise de elegibilidade. Ele lê idade, renda e existência de documentos, avalia as condições e imprime o resultado.
 
-O arquivo `exemplo.c` é a tradução C gerada e é preservado para inspeção e comparação com o código DOC Script.
+Para preservar a tradução C do exemplo, compile com `./docscript exemplo.ln --save-c`. Sem essa opção, o arquivo C intermediário não é gravado no projeto.
 
 ## 8. Estado atual do projeto
 
@@ -337,7 +339,7 @@ Já realizado:
 
 - tokenizador, parser, AST, verificações semânticas e backend C implementados em C;
 - tradução do exemplo procedural para C com paridade validada em relação ao protótipo Python anterior;
-- chamada automática ao compilador C, com preservação do `.c` e repasse dos erros do backend;
+- chamada automática ao compilador C, com preservação opcional do `.c` e repasse dos erros do backend;
 - diagnósticos com categoria, linha, coluna, token encontrado, expectativa e dica;
 - servidor HTTP local e editor Ace conectado à compilação e execução;
 - suíte de testes com golden files de C, saídas esperadas e diagnósticos de erro;
@@ -389,7 +391,7 @@ Esse script exige `legacy/compiler.py` e `cc`; ele não faz parte do fluxo de co
 
 ## 11. Convenções de desenvolvimento
 
-- Preservar os arquivos de código-fonte DOC Script e o C gerado para permitir inspeção e depuração.
+- Preservar os arquivos DOC Script e usar `--save-c` quando o C gerado for útil para inspeção e depuração.
 - Não declarar um recurso como suportado apenas porque o editor Ace o colore; a implementação deve existir no compilador e possuir testes.
 - Evoluir a gramática incrementalmente, registrando cada regra neste documento.
 - Separar tokenização, parsing, validação semântica, representação intermediária, backend e execução.

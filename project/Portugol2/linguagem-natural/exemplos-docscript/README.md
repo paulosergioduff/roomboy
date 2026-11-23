@@ -1,6 +1,6 @@
-# Exemplos em Portugol
+# Exemplos de DOC Script
 
-Os arquivos desta pasta usam o dialeto Portugol aceito pelo DOC Script. Eles estão organizados do exemplo mais simples para os que usam entrada, decisões e laços.
+Os arquivos desta pasta demonstram a sintaxe própria do DOC Script. Eles estão organizados do exemplo mais simples para os que usam entrada, decisões e laços.
 
 Comentários nos dois dialetos são escritos entre parênteses. O tokenizador os remove antes do parser; por exemplo: `(Lê um valor.)`. Todo comentário precisa ser fechado e comentários aninhados não são aceitos.
 
@@ -19,29 +19,30 @@ Os comandos abaixo também devem ser executados nessa pasta.
 Use `run` para compilar e executar um programa:
 
 ```bash
-./docscript run exemplos-portugol/ola_mundo.ln
+./docscript run exemplos-docscript/ola_mundo.ln
 ```
 
 Para fornecer a entrada de demonstração de um programa que usa `leia`, redirecione o arquivo `.in` correspondente:
 
 ```bash
-./docscript run exemplos-portugol/media.ln < exemplos-portugol/media.in
+./docscript run exemplos-docscript/media.ln < exemplos-docscript/media.in
 ```
 
 Cada exemplo com entrada tem um arquivo `.out` com a saída esperada. Compare a saída executando:
 
 ```bash
-./docscript run exemplos-portugol/media.ln < exemplos-portugol/media.in > /tmp/media.out
-diff -u exemplos-portugol/media.out /tmp/media.out
+./docscript run exemplos-docscript/media.ln < exemplos-docscript/media.in > /tmp/media.out
+diff -u exemplos-docscript/media.out /tmp/media.out
 ```
 
 Os parênteses para agrupar expressões ainda não são aceitos pelo parser. Por isso, `media.ln` calcula a média como `nota1 / 2.0 + nota2 / 2.0`.
 
-`emit` gera somente o C, e `check` analisa o programa sem executá-lo:
+`emit` gera explicitamente um arquivo C. Em compilações normais, `--save-c` preserva esse arquivo opcional; sem a opção, o C temporário é removido. `check` analisa sem executar:
 
 ```bash
-./docscript emit exemplos-portugol/tabuada.ln -o /tmp/tabuada.c
-./docscript check exemplos-portugol/tabuada.ln
+./docscript emit exemplos-docscript/tabuada.ln -o /tmp/tabuada.c
+./docscript run exemplos-docscript/tabuada.ln --save-c
+./docscript check exemplos-docscript/tabuada.ln
 ```
 
 ## Exemplos incluídos
