@@ -1,2 +1,7 @@
 /project/*
 !/project/.gitkeep
+!/project/DOCScript/
+/project/DOCScript/*
+!/project/DOCScript/.gitignore
+!/project/DOCScript/port/
+/project/DOCScript/port/*

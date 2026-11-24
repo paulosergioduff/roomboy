@@ -2,3 +2,4 @@
 /exemplo
 /src/*.o
 /src/*.d
+/port/*
