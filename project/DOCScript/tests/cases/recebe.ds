@@ -1,0 +1,12 @@
+Programa "FuncaoRecebe".
+
+Variaveis
+    Resultado: Real.
+
+Função Calcular Recebe Valor e Percentual.
+    Retorna Valor * Percentual.
+
+Inicio
+    Resultado <- Calcular Recebe 200 e 0.15.
+    Escreva Resultado.
+Fim.

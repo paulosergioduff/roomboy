@@ -1,0 +1,12 @@
+Programa "FuncaoRecebeVirgula".
+
+Variaveis
+    Resultado: Real.
+
+Função Multiplicar Recebe Valor, Fator.
+    Retorna Valor * Fator.
+
+Inicio
+    Resultado <- Multiplicar Recebe 7, 6.
+    Escreva Resultado.
+Fim.

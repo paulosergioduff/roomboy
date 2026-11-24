@@ -34,6 +34,11 @@ static void check_expr(const Program *program, const Expr *expr,
     case EX_UNARY:
         check_expr(program, expr->lhs, used, file, warnings, out);
         break;
+    case EX_CALL:
+        for (int i = 0; i < expr->arg_count; i++) {
+            check_expr(program, expr->args[i], used, file, warnings, out);
+        }
+        break;
     case EX_BINARY:
         if (warnings &&
             (!strcmp(expr->op, "=") || !strcmp(expr->op, "!=")) &&

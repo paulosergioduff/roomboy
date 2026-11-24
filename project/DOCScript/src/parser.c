@@ -12,8 +12,25 @@ typedef struct {
     Variable *vars;
     int var_count;
     int var_cap;
+    Program *program;
     Diagnostic *diag;
 } Parser;
+
+static void parser_expr_free(Expr *expr)
+{
+    if (!expr) {
+        return;
+    }
+    free(expr->text);
+    free(expr->op);
+    parser_expr_free(expr->lhs);
+    parser_expr_free(expr->rhs);
+    for (int i = 0; i < expr->arg_count; i++) {
+        parser_expr_free(expr->args[i]);
+    }
+    free(expr->args);
+    free(expr);
+}
 
 static char *strip_quotes(const char *value);
 
@@ -115,6 +132,16 @@ static Variable *find_var(Parser *p, const char *name)
     for (int i = 0; i < p->var_count; i++) {
         if (ident_ieq(p->vars[i].name, name)) {
             return &p->vars[i];
+        }
+    }
+    return NULL;
+}
+
+static Function *find_function(Parser *p, const char *name)
+{
+    for (int i = 0; i < p->program->function_count; i++) {
+        if (ident_ieq(p->program->functions[i].name, name)) {
+            return &p->program->functions[i];
         }
     }
     return NULL;
@@ -233,11 +260,55 @@ static bool parse_expression(Parser *p, int min_prec, Expr **out)
         left->boolean = 0;
     } else if (token->kind == TK_IDENT) {
         advance(p);
+        if (accept_kw(p, "recebe")) {
+            Function *function = find_function(p, token->value);
+            if (!function) {
+                char message[256];
+                snprintf(message, sizeof(message),
+                         "Função '%s' não foi declarada.", token->value);
+                return fail_at(p, DIAG_SEMANTICO, token, message,
+                               "nome de função declarada com Recebe",
+                               "Declare a função antes de chamá-la.");
+            }
+            left = new_expr_at(EX_CALL, token);
+            left->text = xstrdup(token->value);
+            int cap = 0;
+            do {
+                Expr *arg = NULL;
+                if (!parse_expression(p, 3, &arg)) {
+                    return false;
+                }
+                if (left->arg_count == cap) {
+                    cap = cap ? cap * 2 : 4;
+                    left->args = xrealloc(left->args,
+                                          (size_t)cap * sizeof(Expr *));
+                }
+                left->args[left->arg_count++] = arg;
+                if (accept(p, TK_COMMA)) {
+                    continue;
+                }
+                if (accept_kw(p, "e")) {
+                    continue;
+                }
+                break;
+            } while (true);
+            if (left->arg_count != function->param_count) {
+                char message[256];
+                snprintf(message, sizeof(message),
+                         "Função '%s' recebe %d valor(es), mas recebeu %d.",
+                         function->name, function->param_count,
+                         left->arg_count);
+                return fail_at(p, DIAG_SEMANTICO, token, message,
+                               "quantidade de valores declarada em Recebe",
+                               "Passe um valor para cada parâmetro.");
+            }
+        } else {
         if (!require_variable(p, token)) {
             return false;
         }
         left = new_expr_at(EX_VARIABLE, token);
         left->text = xstrdup(token->value);
+        }
     } else {
         return fail(p, DIAG_SINTATICO, "Expressão esperada.",
                     "número, texto, variável, verdadeiro/falso ou expressão "
@@ -851,6 +922,10 @@ static bool is_new_syntax(const TokenList *tokens)
 {
     const Token *first = &tokens->items[0];
     if (token_is_kw(first, "funcao")) {
+        if (tokens->items[1].kind == TK_IDENT &&
+            token_is_kw(&tokens->items[2], "recebe")) {
+            return false;
+        }
         return true;
     }
     if (token_is_kw(first, "inicio")) {
@@ -1197,6 +1272,85 @@ static bool parse_variables(Parser *p)
     return true;
 }
 
+static bool parse_function(Parser *p)
+{
+    const Token *keyword = advance(p);
+    const Token *name = expect(p, TK_IDENT, "nome da função",
+                               "Exemplo: Função Calcular Recebe Valor.");
+    if (!name) {
+        return false;
+    }
+    if (find_function(p, name->value)) {
+        char message[256];
+        snprintf(message, sizeof(message), "Função '%s' declarada mais de uma vez.",
+                 name->value);
+        return fail_at(p, DIAG_SEMANTICO, name, message,
+                       "nome de função ainda não declarado",
+                       "Escolha outro nome para a função.");
+    }
+    if (!expect_kw(p, "recebe")) {
+        return false;
+    }
+
+    Function function;
+    memset(&function, 0, sizeof(function));
+    function.name = xstrdup(name->value);
+    function.line = keyword->line;
+    function.col = keyword->col;
+    int params_cap = 0;
+    int saved_var_count = p->var_count;
+    for (;;) {
+        const Token *param = expect(p, TK_IDENT, "nome de parâmetro",
+                                    "Separe parâmetros com vírgula ou 'e'.");
+        if (!param) {
+            goto error;
+        }
+        if (find_var(p, param->value)) {
+            char message[256];
+            snprintf(message, sizeof(message),
+                     "Parâmetro '%s' duplicado ou já declarado no escopo.",
+                     param->value);
+            fail_at(p, DIAG_SEMANTICO, param, message,
+                    "nome de parâmetro único", NULL);
+            goto error;
+        }
+        if (function.param_count == params_cap) {
+            params_cap = params_cap ? params_cap * 2 : 4;
+            function.params = xrealloc(function.params,
+                                       (size_t)params_cap * sizeof(char *));
+        }
+        function.params[function.param_count++] = xstrdup(param->value);
+        add_var(p, param->value, TY_REAL, param->line, param->col);
+        if (accept(p, TK_COMMA) || accept_kw(p, "e")) {
+            continue;
+        }
+        break;
+    }
+
+    if (!expect_dot(p) || !expect_kw(p, "retorna") ||
+        !parse_expression(p, 1, &function.return_expr) || !expect_dot(p)) {
+        goto error;
+    }
+
+    while (p->var_count > saved_var_count) {
+        free(p->vars[--p->var_count].name);
+    }
+    p->program->functions = xrealloc(
+        p->program->functions,
+        (size_t)(p->program->function_count + 1) * sizeof(Function));
+    p->program->functions[p->program->function_count++] = function;
+    return true;
+
+error:
+    free(function.name);
+    for (int i = 0; i < function.param_count; i++) {
+        free(function.params[i]);
+    }
+    free(function.params);
+    parser_expr_free(function.return_expr);
+    return false;
+}
+
 bool parse_program(const TokenList *tokens, Program *program, Diagnostic *diag)
 {
     Parser p;
@@ -1205,6 +1359,7 @@ bool parse_program(const TokenList *tokens, Program *program, Diagnostic *diag)
     p.diag = diag;
 
     memset(program, 0, sizeof(*program));
+    p.program = program;
     program->name = xstrdup("Programa");
 
     if (is_new_syntax(tokens)) {
@@ -1238,6 +1393,10 @@ bool parse_program(const TokenList *tokens, Program *program, Diagnostic *diag)
 
     if (ok && accept_kw(&p, "variaveis")) {
         ok = parse_variables(&p);
+    }
+
+    while (ok && token_is_kw(cur(&p), "funcao")) {
+        ok = parse_function(&p);
     }
 
     if (ok) {

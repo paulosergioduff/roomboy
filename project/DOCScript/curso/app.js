@@ -26,17 +26,25 @@ const lessons = [
       <h2>Explique suas escolhas</h2>
       <p>Toda referência (variáveis, funções e nomes) começa com maiúscula. Comentários ficam entre parênteses e são removidos pelo tokenizador. Os marcadores <code>/*</code> e <code>*/</code> delimitam trechos de exemplo; os marcadores não geram código. As palavras reservadas ficam no conjunto de idioma <code>pt</code>.</p>
       <div class="tip"><strong>Dica:</strong> comentários explicam o motivo de uma decisão. Prefira uma frase curta que acrescente algo ao próprio código.</div>
-      <p>Funções recebem parâmetros com <code>Recebe</code>, separam nomes com <code>e</code> e encerram a lista com ponto. Exemplo da forma da declaração:</p>
+      <p>Funções recebem parâmetros com <code>Recebe</code>, separam nomes por vírgula (ou por <code>e</code>) e encerram a lista com ponto. Exemplo da declaração:</p>
       <pre><code>Função Calcular Recebe Valor e Percentual.
     Retorna Valor * Percentual.</code></pre>
-      <div class="challenge"><span class="challenge-label">DESAFIO</span><p>Adicione um comentário e mude o programa para imprimir uma saudação em duas linhas.</p></div>`,
-    code: `programa "Saudacao" {
-    funcao inicio {
-        (Esta Mensagem Aparece Antes Do Nome.)
-        escreva "Ola, "
-        escreval "mundo!"
-    }
-}`,
+      <div class="challenge"><span class="challenge-label">DESAFIO</span><p>Altere os valores passados a <code>Calcular</code> e confira o resultado. Depois, mova a chamada para fora dos marcadores de snippet e veja que eles não mudam a execução.</p></div>`,
+    code: `Programa "Calculadora".
+
+Variaveis
+    Resultado: Real.
+
+Função Calcular Recebe Valor e Percentual.
+    Retorna Valor * Percentual.
+
+Inicio
+    (O comentário não altera o cálculo.)
+    /*
+    Resultado <- Calcular Recebe 200 e 0.15.
+    */
+    Escreva Resultado.
+Fim.`,
     stdin: ""
   },
   {

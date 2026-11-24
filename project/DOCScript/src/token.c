@@ -11,13 +11,24 @@
 
 bool token_is_kw(const Token *token, const char *keyword)
 {
-    return token->kind == TK_KW && ascii_ieq(token->value, keyword);
+    if (token->kind != TK_KW) {
+        return false;
+    }
+    if (!strcmp(keyword, "funcao") &&
+        (!strcmp(token->value, "função") || !strcmp(token->value, "Função"))) {
+        return true;
+    }
+    return ascii_ieq(token->value, keyword);
 }
 
 static bool is_keyword(const char *value, size_t len, const char *language)
 {
     if (strcmp(language, "pt") != 0) {
         return false;
+    }
+    if (len == strlen("função") &&
+        (!memcmp(value, "função", len) || !memcmp(value, "Função", len))) {
+        return true;
     }
     for (size_t i = 0; i < DOCSCRIPT_PT_KEYWORD_COUNT; i++) {
         const char *kw = DOCSCRIPT_PT_KEYWORDS[i];

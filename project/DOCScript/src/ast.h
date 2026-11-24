@@ -22,6 +22,7 @@ typedef enum {
     EX_CHAR,
     EX_BOOL,
     EX_VARIABLE,
+    EX_CALL,
     EX_UNARY,
     EX_BINARY
 } ExprKind;
@@ -35,7 +36,18 @@ typedef struct Expr {
     int col;
     struct Expr *lhs;
     struct Expr *rhs;
+    struct Expr **args;
+    int arg_count;
 } Expr;
+
+typedef struct {
+    char *name;
+    char **params;
+    int param_count;
+    Expr *return_expr;
+    int line;
+    int col;
+} Function;
 
 typedef enum {
     ST_READ,
@@ -75,6 +87,8 @@ typedef struct {
     int import_count;
     Variable *variables;
     int variable_count;
+    Function *functions;
+    int function_count;
     Stmt **body;
     int body_count;
 } Program;

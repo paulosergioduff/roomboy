@@ -1,0 +1,11 @@
+Programa "ErroRecebeQuantidade".
+
+Variaveis
+    Resultado: Real.
+
+Funcao Calcular Recebe Valor e Percentual.
+    Retorna Valor * Percentual.
+
+Inicio
+    Resultado <- Calcular Recebe 10.
+Fim.

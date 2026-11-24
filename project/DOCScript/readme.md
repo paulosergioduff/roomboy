@@ -8,16 +8,18 @@ DOCScript é uma linguagem compilada com palavras reservadas em português. O c�
 - Toda referência — variáveis, funções e demais nomes — começa com letra maiúscula.
 - Comentários usam parênteses: `(comentário)`. Não podem ser aninhados.
 - `/*` e `*/` são marcadores de snippets. O tokenizador remove apenas os marcadores; o conteúdo entre eles continua sendo código ativo.
-- A declaração de parâmetros de função usa `Recebe`, nomes separados por `e` e ponto final, por exemplo:
+- A declaração de parâmetros usa `Recebe`, separa os nomes por vírgula (ou `e`) e termina com ponto. O corpo retorna uma expressão com `Retorna`:
 
   ```text
   Função Calcular Recebe Valor e Percentual.
       Retorna Valor * Percentual.
   ```
 
+  Uma chamada passa os valores com a mesma palavra: `Calcular Recebe 200 e 0.15.` (vírgula também é aceita).
+
 - Comandos da forma tradicional terminam com ponto final. A sintaxe compacta atual também aceita blocos entre chaves e separadores opcionais.
 
-O parser C atual suporta o subconjunto implementado de programas, variáveis, entrada e saída, expressões, decisões e laços. A forma de declaração de funções acima está documentada como regra da linguagem, mas ainda não está ligada à AST e à geração de código; referências com minúscula são rejeitadas pelo tokenizador.
+O parser C suporta funções numéricas de retorno por expressão, parâmetros, chamadas, programas, variáveis, entrada e saída, expressões, decisões e laços. Referências iniciadas por minúsculas são rejeitadas pelo tokenizador.
 
 ## Organização
 

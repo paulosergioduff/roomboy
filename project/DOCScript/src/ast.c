@@ -28,6 +28,10 @@ static void expr_free(Expr *expr)
     free(expr->op);
     expr_free(expr->lhs);
     expr_free(expr->rhs);
+    for (int i = 0; i < expr->arg_count; i++) {
+        expr_free(expr->args[i]);
+    }
+    free(expr->args);
     free(expr);
 }
 
@@ -69,6 +73,16 @@ void program_free(Program *program)
         free(program->variables[i].name);
     }
     free(program->variables);
+    for (int i = 0; i < program->function_count; i++) {
+        Function *function = &program->functions[i];
+        free(function->name);
+        for (int j = 0; j < function->param_count; j++) {
+            free(function->params[j]);
+        }
+        free(function->params);
+        expr_free(function->return_expr);
+    }
+    free(program->functions);
     for (int i = 0; i < program->body_count; i++) {
         stmt_free(program->body[i]);
     }
@@ -78,6 +92,8 @@ void program_free(Program *program)
     program->import_count = 0;
     program->variables = NULL;
     program->variable_count = 0;
+    program->functions = NULL;
+    program->function_count = 0;
     program->body = NULL;
     program->body_count = 0;
 }

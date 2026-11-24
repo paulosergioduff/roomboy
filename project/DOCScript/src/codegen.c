@@ -153,6 +153,19 @@ static void expr_to_c(StrBuf *sb, const Expr *expr)
         free(name);
         break;
     }
+    case EX_CALL: {
+        char *name = codegen_ident(expr->text);
+        sb_printf(sb, "%s(", name);
+        free(name);
+        for (int i = 0; i < expr->arg_count; i++) {
+            if (i) {
+                sb_puts(sb, ", ");
+            }
+            expr_to_c(sb, expr->args[i]);
+        }
+        sb_putc(sb, ')');
+        break;
+    }
     case EX_UNARY: {
         sb_putc(sb, '(');
         if (!strcmp(expr->op, "nao")) {
@@ -450,6 +463,27 @@ char *codegen_program(const Program *program)
     sb_puts(&sb, "/* Código gerado automaticamente. Não edite este arquivo "
                  "diretamente. */\n");
     sb_puts(&sb, "#include <stdio.h>\n\n");
+
+    for (int i = 0; i < program->function_count; i++) {
+        const Function *function = &program->functions[i];
+        char *name = codegen_ident(function->name);
+        sb_printf(&sb, "static double %s(", name);
+        free(name);
+        if (function->param_count == 0) {
+            sb_puts(&sb, "void");
+        }
+        for (int j = 0; j < function->param_count; j++) {
+            char *param = codegen_ident(function->params[j]);
+            if (j) {
+                sb_puts(&sb, ", ");
+            }
+            sb_printf(&sb, "double %s", param);
+            free(param);
+        }
+        sb_puts(&sb, ") {\n    return ");
+        expr_to_c(&sb, function->return_expr);
+        sb_puts(&sb, ";\n}\n\n");
+    }
     sb_puts(&sb, "int main(void) {\n");
 
     for (int i = 0; i < program->variable_count; i++) {

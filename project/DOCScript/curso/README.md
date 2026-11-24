@@ -8,10 +8,10 @@ O curso tem dez aulas com navegação, exemplos editáveis, entrada padrão e ex
 - Toda referência começa com letra maiúscula: nomes de variáveis, funções e outros identificadores.
 - Comentários de documentação usam `( ... )`; precisam ser fechados e não podem ser aninhados.
 - `/*` e `*/` são marcadores de snippets. Eles próprios não fazem nada; o texto entre eles continua sendo código.
-- Parâmetros de função são introduzidos por `Recebe`, separados por `e`, e a lista termina com ponto. Exemplo: `Função Calcular Recebe Valor e Percentual.`
+- Parâmetros de função são introduzidos por `Recebe`, separados por vírgula (ou `e`), e a lista termina com ponto. O corpo usa `Retorna`; a chamada passa valores após `Recebe`. Exemplo: `Calcular Recebe 200 e 0.15.`
 - Instruções do dialeto tradicional terminam em ponto final. Blocos do dialeto compacto usam chaves.
 
-A forma de declaração com `Recebe` está definida como regra, mas ainda não está implementada no parser e no backend C.
+O compilador implementa funções numéricas com corpo de uma expressão `Retorna`.
 
 ## Iniciar
 
