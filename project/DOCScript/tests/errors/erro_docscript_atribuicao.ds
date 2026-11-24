@@ -1,0 +1,6 @@
+programa "Atribuicao" {
+    funcao inicio {
+        inteiro X = 1
+        X + 1
+    }
+}

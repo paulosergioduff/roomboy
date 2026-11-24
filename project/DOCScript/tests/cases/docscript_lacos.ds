@@ -1,0 +1,26 @@
+programa "DocScriptLacos" {
+    funcao inicio {
+        inteiro I = 0
+
+        enquanto I < 3 {
+            escreval I
+            I = I + 1
+        }
+
+        para inteiro J = 0; J < 3; J++ {
+            se J = 1 {
+                continue
+            }
+            escreval "j=", J
+        }
+
+        faca {
+            I = I - 1
+            se I = 1 {
+                pare
+            }
+        } enquanto I > 0
+
+        escreval "fim ", I
+    }
+}

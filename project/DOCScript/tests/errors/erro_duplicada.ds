@@ -1,0 +1,6 @@
+Variaveis
+    X: Inteiro.
+    X: Real.
+Inicio
+    X <- 1.
+Fim.

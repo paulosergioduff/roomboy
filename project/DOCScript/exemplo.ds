@@ -1,0 +1,35 @@
+Arquivos: "Cadastro".
+
+Programa "AnaliseElegibilidade".
+
+Variaveis
+    Idade: Inteiro.
+    Renda: Real.
+    Possui_documentos: Logico.
+    Elegivel: Logico.
+
+Inicio
+    (Recebe os dados do candidato.)
+    Escreva "Idade ///update////: ".
+    Leia Idade.
+
+    Escreva "Renda mensal: ".
+    Leia Renda.
+
+    Escreva "Possui documentos? (1 para sim, 0 para nao): ".
+    Leia Possui_documentos.
+
+    (Avalia os criterios de elegibilidade.)
+    Se Idade >= 18 e Renda >= 2200 e Possui_documentos = verdadeiro entao.
+        Elegivel <- verdadeiro.
+    Senao.
+        Elegivel <- falso.
+    FimSe.
+
+    (Apresenta o resultado.)
+    Se Elegivel = verdadeiro entao.
+        Escreva "Candidato elegivel".
+    Senao.
+        Escreva "Candidato nao elegivel".
+    FimSe.
+Fim.

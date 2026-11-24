@@ -1,0 +1,23 @@
+programa "DocScriptBasico" {
+    funcao inicio {
+        (Comentarios entre parenteses tambem sao aceitos neste dialeto.)
+        inteiro Idade = 20
+        inteiro Resto = 7 % 2
+        cadeia Nome = "Ana"
+        logico Autorizado = verdadeiro
+
+        escreval "Nome: ", Nome
+        escreval "Idade: ", Idade
+        escreval "Resto: ", Resto
+
+        se Idade >= 18 e Autorizado {
+            escreval "maior"
+        } senao {
+            escreval "menor"
+        }
+
+        se nao Autorizado {
+            escreval "negado"
+        }
+    }
+}

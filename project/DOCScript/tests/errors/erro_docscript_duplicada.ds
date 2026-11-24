@@ -1,0 +1,6 @@
+programa "Duplicada" {
+    funcao inicio {
+        inteiro X = 1
+        inteiro X = 2
+    }
+}

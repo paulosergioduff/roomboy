@@ -1,0 +1,17 @@
+programa "Media" {
+    funcao inicio {
+        (Declara as duas notas e a media calculada.)
+        real Nota1
+        real Nota2
+        real Media
+
+        escreva "Primeira nota: "
+        leia Nota1
+        escreva "Segunda nota: "
+        leia Nota2
+
+        (A expressao usa a soma das metades porque agrupamento ainda nao e suportado.)
+        Media = Nota1 / 2.0 + Nota2 / 2.0
+        escreval "Media: ", Media
+    }
+}

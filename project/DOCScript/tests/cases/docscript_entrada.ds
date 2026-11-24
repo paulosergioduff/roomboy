@@ -1,0 +1,15 @@
+programa "DocScriptEntrada" {
+    funcao inicio {
+        inteiro A
+        inteiro B
+        inteiro Soma
+        real Media
+
+        leia A, B
+        Soma = A + B
+        Media = Soma / 2.0
+
+        escreval "soma=", Soma
+        escreval "media=", Media
+    }
+}

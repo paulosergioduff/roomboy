@@ -1,0 +1,18 @@
+Programa "Logica".
+Variaveis
+    Idade: Inteiro.
+    Autorizado: Logico.
+    Resultado: Logico.
+Inicio
+    Leia Idade.
+    Autorizado <- verdadeiro.
+    Resultado <- Idade >= 18 e Autorizado = verdadeiro.
+    Se Resultado entao.
+        Escreva "entrou".
+    Senao.
+        Escreva "bloqueado".
+    FimSe.
+    Se nao Resultado entao.
+        Escreva "negado".
+    FimSe.
+Fim.

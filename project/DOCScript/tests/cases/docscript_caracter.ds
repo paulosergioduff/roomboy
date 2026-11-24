@@ -1,0 +1,9 @@
+programa "DocScriptCaracter" {
+    funcao inicio {
+        caracter Letra = 'A'
+
+        escreva "Letra: "
+        escreval Letra
+        escreval "Codigo: ", Letra
+    }
+}

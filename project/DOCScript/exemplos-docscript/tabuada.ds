@@ -1,0 +1,12 @@
+programa "Tabuada" {
+    funcao inicio {
+        inteiro Numero = 5
+        inteiro Multiplicador = 1
+
+        (Repete ate montar os dez primeiros resultados.)
+        enquanto Multiplicador <= 10 {
+            escreval Numero, " x ", Multiplicador, " = ", Numero * Multiplicador
+            Multiplicador = Multiplicador + 1
+        }
+    }
+}

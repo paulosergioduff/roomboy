@@ -1,0 +1,13 @@
+programa "Contagem" {
+    funcao inicio {
+        inteiro Limite
+
+        escreva "Contar ate: "
+        leia Limite
+
+        (Conta do primeiro numero ate o limite informado.)
+        para inteiro Numero = 1; Numero <= Limite; Numero++ {
+            escreval Numero
+        }
+    }
+}

@@ -1,0 +1,6 @@
+programa "ErroReferencia" {
+    funcao inicio {
+        inteiro idade = 1
+        escreval idade
+    }
+}

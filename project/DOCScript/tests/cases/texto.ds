@@ -1,0 +1,12 @@
+Programa "Texto".
+Variaveis
+    Nome: Texto.
+    Idade: Inteiro.
+Inicio
+    Escreva "Nome: ".
+    Leia Nome.
+    Escreva "Idade: ".
+    Leia Idade.
+    Escreva Nome.
+    Escreva Idade.
+Fim.

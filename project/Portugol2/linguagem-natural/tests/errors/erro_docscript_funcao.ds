@@ -1,5 +1,0 @@
-programa "Funcao" {
-    funcao inteiro soma {
-        retorne 1
-    }
-}

@@ -1,6 +1,0 @@
-programa "Atribuicao" {
-    funcao inicio {
-        inteiro x = 1
-        x + 1
-    }
-}

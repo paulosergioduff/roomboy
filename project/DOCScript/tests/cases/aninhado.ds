@@ -1,0 +1,17 @@
+Programa "Aninhado".
+Variaveis
+    X: Inteiro.
+    Y: Inteiro.
+Inicio
+    Leia X.
+    Se X > 0 entao.
+        Se X > 10 entao.
+            Y <- X * 2 + 1.
+        Senao.
+            Y <- -X.
+        FimSe.
+    Senao.
+        Y <- 0.
+    FimSe.
+    Escreva Y.
+Fim.

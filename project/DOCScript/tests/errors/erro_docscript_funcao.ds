@@ -1,0 +1,5 @@
+programa "Funcao" {
+    funcao inteiro Soma {
+        retorne 1
+    }
+}

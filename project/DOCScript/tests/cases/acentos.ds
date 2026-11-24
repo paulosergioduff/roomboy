@@ -1,0 +1,9 @@
+Programa "Acentos".
+Variaveis
+    AçãO: Inteiro.
+    NúMero: Inteiro.
+Inicio
+    AçãO <- 10.
+    NúMero <- 5.
+    Escreva AçãO + NúMero.
+Fim.

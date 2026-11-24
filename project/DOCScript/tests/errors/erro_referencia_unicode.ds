@@ -1,0 +1,6 @@
+programa "ErroUnicode" {
+    funcao inicio {
+        inteiro ação = 1
+        escreval ação
+    }
+}
