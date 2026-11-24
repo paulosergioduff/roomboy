@@ -22,10 +22,10 @@ if [ ! -x "$BIN" ]; then
 fi
 
 echo "== Geração de C (golden files) =="
-for ln in "$ROOT"/tests/cases/*.ln; do
-    name="$(basename "$ln" .ln)"
+for source in "$ROOT"/tests/cases/*.ds; do
+    name="$(basename "$source" .ds)"
     expected="$ROOT/tests/expected/$name.c"
-    if "$BIN" emit "$ln" -o "$TMP/$name.c" --quiet \
+    if "$BIN" emit "$source" -o "$TMP/$name.c" --quiet \
         >"$TMP/$name.emit.out" 2>"$TMP/$name.emit.err"; then
         if diff -u "$expected" "$TMP/$name.c" >"$TMP/$name.diff" 2>&1; then
             ok
@@ -40,14 +40,14 @@ for ln in "$ROOT"/tests/cases/*.ln; do
 done
 
 echo "== Execução dos programas =="
-for ln in "$ROOT"/tests/cases/*.ln; do
-    name="$(basename "$ln" .ln)"
+for source in "$ROOT"/tests/cases/*.ds; do
+    name="$(basename "$source" .ds)"
     input="/dev/null"
-    if [ -f "${ln%.ln}.in" ]; then
-        input="${ln%.ln}.in"
+    if [ -f "${source%.ds}.in" ]; then
+        input="${source%.ds}.in"
     fi
-    expected="${ln%.ln}.out"
-    if "$BIN" run "$ln" --exe "$TMP/$name" -o "$TMP/$name.c" --quiet \
+    expected="${source%.ds}.out"
+    if "$BIN" run "$source" --exe "$TMP/$name" -o "$TMP/$name.c" --quiet \
         <"$input" >"$TMP/$name.out" 2>"$TMP/$name.run.err"; then
         if diff -u "$expected" "$TMP/$name.out" >"$TMP/$name.run.diff" 2>&1; then
             ok
@@ -62,8 +62,8 @@ for ln in "$ROOT"/tests/cases/*.ln; do
 done
 
 echo "== Arquivo C opcional =="
-cp "$ROOT/tests/cases/ola.ln" "$TMP/preservacao.ln"
-if "$BIN" run "$TMP/preservacao.ln" --exe "$TMP/preservacao" --quiet \
+cp "$ROOT/tests/cases/ola.ds" "$TMP/preservacao.ds"
+if "$BIN" run "$TMP/preservacao.ds" --exe "$TMP/preservacao" --quiet \
     >"$TMP/preservacao.out" 2>"$TMP/preservacao.err"; then
     if [ -e "$TMP/preservacao.c" ]; then
         bad "C intermediário foi salvo sem --save-c"
@@ -75,7 +75,7 @@ else
     cat "$TMP/preservacao.err"
 fi
 
-if "$BIN" run "$TMP/preservacao.ln" --exe "$TMP/preservacao-salva" \
+if "$BIN" run "$TMP/preservacao.ds" --exe "$TMP/preservacao-salva" \
     --save-c --quiet >"$TMP/preservacao-save.out" \
     2>"$TMP/preservacao-save.err"; then
     if [ -f "$TMP/preservacao.c" ]; then
@@ -89,14 +89,14 @@ else
 fi
 
 echo "== Diagnósticos de erro =="
-for ln in "$ROOT"/tests/errors/*.ln; do
-    name="$(basename "$ln" .ln)"
-    expect_file="${ln%.ln}.expect"
+for source in "$ROOT"/tests/errors/*.ds; do
+    name="$(basename "$source" .ds)"
+    expect_file="${source%.ds}.expect"
     if [ ! -f "$expect_file" ]; then
         bad "expectativa ausente para $name ($expect_file)"
         continue
     fi
-    if "$BIN" check "$ln" >"$TMP/$name.out" 2>"$TMP/$name.err"; then
+    if "$BIN" check "$source" >"$TMP/$name.out" 2>"$TMP/$name.err"; then
         bad "$name foi aceito, mas deveria falhar"
         continue
     fi

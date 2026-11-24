@@ -1,0 +1,11 @@
+Programa "Aritmetica".
+Variaveis
+    a: Inteiro.
+    b: Inteiro.
+    media: Real.
+Inicio
+    Leia a.
+    Leia b.
+    media <- a + b / 2.0.
+    Escreva media.
+Fim.

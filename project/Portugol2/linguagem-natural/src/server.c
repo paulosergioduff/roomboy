@@ -47,7 +47,7 @@ typedef struct {
 
 typedef struct {
     char *dir;
-    char *ln_path;
+    char *source_path;
     char *c_path;
     char *exe_path;
     int ok;
@@ -342,7 +342,7 @@ static void remove_session_files(const char *dir)
     if (!dir) {
         return;
     }
-    static const char *const names[] = {"main.ln", "main.c", "programa",
+    static const char *const names[] = {"main.ds", "main.c", "programa",
                                         "in.fifo", "stop", "running"};
     for (size_t i = 0; i < sizeof(names) / sizeof(names[0]); i++) {
         char *path = path_join(dir, names[i]);
@@ -377,7 +377,7 @@ static void cleanup_stale_sessions(void)
 
 static void build_result_free(BuildResult *result)
 {
-    free(result->ln_path);
+    free(result->source_path);
     free(result->c_path);
     free(result->exe_path);
     free(result->diagnostics);
@@ -401,16 +401,16 @@ static int build_source(const char *code, BuildResult *result)
         return -1;
     }
     result->dir = xstrdup(dir);
-    result->ln_path = path_join(dir, "main.ln");
+    result->source_path = path_join(dir, "main.ds");
     result->c_path = path_join(dir, "main.c");
     result->exe_path = path_join(dir, "programa");
 
-    if (write_file(result->ln_path, code, strlen(code)) != 0) {
+    if (write_file(result->source_path, code, strlen(code)) != 0) {
         result->stage = "io";
         return -1;
     }
 
-    char *build_argv[] = {g_self,       "build", result->ln_path, "-o",
+    char *build_argv[] = {g_self,       "build", result->source_path, "-o",
                           result->c_path, "--exe", result->exe_path,
                           "--quiet",   NULL};
     ProcResult build;
@@ -580,7 +580,7 @@ static void handle_session_create(int fd, const char *body)
 
     free(esc_diag);
     free(esc_c);
-    free(build.ln_path);
+    free(build.source_path);
     free(build.c_path);
     free(build.exe_path);
     free(build.diagnostics);
@@ -1005,7 +1005,7 @@ static void handle_connection(int fd, const ServerOptions *options)
     } else if (!strcmp(method, "GET") && (!strcmp(path, "/") ||
                                            !strcmp(path, "/index.html"))) {
         serve_file(fd, options->editor, "text/html; charset=utf-8");
-    } else if (!strcmp(method, "GET") && !strcmp(path, "/exemplo.ln")) {
+    } else if (!strcmp(method, "GET") && !strcmp(path, "/exemplo.ds")) {
         serve_file(fd, options->example, "text/plain; charset=utf-8");
     } else if (!strcmp(method, "GET") &&
                (!strcmp(path, "/curso") || !strcmp(path, "/curso/") ||
@@ -1068,7 +1068,7 @@ int server_main(int argc, char **argv)
     options.port = 8080;
     options.host = "127.0.0.1";
     options.editor = "editor.html";
-    options.example = "exemplo.ln";
+    options.example = "exemplo.ds";
 
     for (int i = 1; i < argc; i++) {
         if (!strcmp(argv[i], "--port") && i + 1 < argc) {
@@ -1081,7 +1081,7 @@ int server_main(int argc, char **argv)
             options.example = argv[++i];
         } else if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")) {
             printf("Uso: docscript serve [--port N] [--host H] "
-                   "[--editor arquivo.html] [--example arquivo.ln]\n");
+                   "[--editor arquivo.html] [--example arquivo.ds]\n");
             return 0;
         } else {
             fprintf(stderr, "docscript serve: opção desconhecida '%s'.\n",

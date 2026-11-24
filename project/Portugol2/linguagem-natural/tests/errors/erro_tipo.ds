@@ -1,0 +1,5 @@
+Variaveis
+    x: Numero.
+Inicio
+    x <- 1.
+Fim.

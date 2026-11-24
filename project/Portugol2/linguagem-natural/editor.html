@@ -170,7 +170,7 @@
 <div class="app">
   <aside class="sidebar">
     <div class="sidehead">Explorador</div>
-    <div class="file">▤ &nbsp;exemplo.ln</div>
+    <div class="file">▤ &nbsp;exemplo.ds</div>
     <div class="sidehead">Terminal</div>
     <div class="hint">
       Clique em <b>Executar</b>. O programa roda no painel inferior e a saída
@@ -191,7 +191,7 @@
       e acesse <code>http://127.0.0.1:8080/</code> para compilar e executar.
     </div>
 
-    <div class="tabbar"><div class="tab"><span class="dot">●</span> exemplo.ln</div></div>
+    <div class="tabbar"><div class="tab"><span class="dot">●</span> exemplo.ds</div></div>
     <div class="editor-wrap"><div id="editor"></div></div>
 
     <section class="bottom" id="bottom">
@@ -734,7 +734,7 @@ A saída aparecerá aqui e você poderá digitar as entradas quando o programa p
     document.getElementById("offline-banner").hidden = false;
     setStatus("Abra pelo servidor local para compilar", "warn");
   } else {
-    fetch("/exemplo.ln")
+    fetch("/exemplo.ds")
       .then(function (response) { return response.ok ? response.text() : null; })
       .then(function (text) {
         if (text && readStored(STORAGE_CODE) === null) {

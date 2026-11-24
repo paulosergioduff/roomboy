@@ -1,0 +1,9 @@
+Programa "Acentos".
+Variaveis
+    ação: Inteiro.
+    número: Inteiro.
+Inicio
+    ação <- 10.
+    número <- 5.
+    Escreva ação + número.
+Fim.
