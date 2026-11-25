@@ -45,6 +45,8 @@ typedef struct {
     char **params;
     int param_count;
     Expr *return_expr;
+    struct Stmt **body;
+    int body_count;
     int line;
     int col;
 } Function;
@@ -94,6 +96,7 @@ typedef struct {
 } Program;
 
 const char *ln_type_name(LnType type);
+void stmt_free(Stmt *stmt);
 void program_free(Program *program);
 
 #endif

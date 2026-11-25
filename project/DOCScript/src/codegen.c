@@ -455,19 +455,28 @@ static void emit_statement(StrBuf *sb, const Stmt *stmt, const Program *program,
     }
 }
 
-char *codegen_program(const Program *program)
+char *codegen_program(const Program *program, int module_only)
 {
     StrBuf sb;
     sb_init(&sb);
 
     sb_puts(&sb, "/* Código gerado automaticamente. Não edite este arquivo "
                  "diretamente. */\n");
+    for (int i = 0; i < program->import_count; i++) {
+        const char *header = program->imports[i];
+        size_t n = strlen(header);
+        if ((n >= 2 && !strcmp(header + n - 2, ".h")) ||
+            (n >= 4 && !strcmp(header + n - 4, ".hpp"))) {
+            sb_printf(&sb, "#include \"%s\"\n", header);
+        }
+    }
+    if (program->import_count) sb_putc(&sb, '\n');
     sb_puts(&sb, "#include <stdio.h>\n\n");
 
     for (int i = 0; i < program->function_count; i++) {
         const Function *function = &program->functions[i];
         char *name = codegen_ident(function->name);
-        sb_printf(&sb, "static double %s(", name);
+        sb_printf(&sb, "%sdouble %s(", module_only ? "" : "static ", name);
         free(name);
         if (function->param_count == 0) {
             sb_puts(&sb, "void");
@@ -480,10 +489,20 @@ char *codegen_program(const Program *program)
             sb_printf(&sb, "double %s", param);
             free(param);
         }
-        sb_puts(&sb, ") {\n    return ");
-        expr_to_c(&sb, function->return_expr);
-        sb_puts(&sb, ";\n}\n\n");
+        sb_puts(&sb, ") {\n");
+        if (function->return_expr) {
+            sb_puts(&sb, "    return ");
+            expr_to_c(&sb, function->return_expr);
+            sb_puts(&sb, ";\n");
+        } else {
+            for (int j = 0; j < function->body_count; j++) {
+                emit_statement(&sb, function->body[j], program, 1);
+                sb_putc(&sb, '\n');
+            }
+        }
+        sb_puts(&sb, "}\n\n");
     }
+    if (module_only) return sb_take(&sb);
     sb_puts(&sb, "int main(void) {\n");
 
     for (int i = 0; i < program->variable_count; i++) {

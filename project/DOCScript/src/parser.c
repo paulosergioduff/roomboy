@@ -262,13 +262,13 @@ static bool parse_expression(Parser *p, int min_prec, Expr **out)
         advance(p);
         if (accept_kw(p, "recebe")) {
             Function *function = find_function(p, token->value);
-            if (!function) {
+            if (!function && p->program->import_count == 0) {
                 char message[256];
                 snprintf(message, sizeof(message),
                          "Função '%s' não foi declarada.", token->value);
                 return fail_at(p, DIAG_SEMANTICO, token, message,
                                "nome de função declarada com Recebe",
-                               "Declare a função antes de chamá-la.");
+                               "Declare a função ou importe o módulo que a contém.");
             }
             left = new_expr_at(EX_CALL, token);
             left->text = xstrdup(token->value);
@@ -292,7 +292,7 @@ static bool parse_expression(Parser *p, int min_prec, Expr **out)
                 }
                 break;
             } while (true);
-            if (left->arg_count != function->param_count) {
+            if (function && left->arg_count != function->param_count) {
                 char message[256];
                 snprintf(message, sizeof(message),
                          "Função '%s' recebe %d valor(es), mas recebeu %d.",
@@ -1082,6 +1082,16 @@ static bool parse_block(Parser *p, const char *const *stops, int stop_count,
 
 static Stmt *parse_statement(Parser *p)
 {
+    if (accept_kw(p, "retorna") || accept_kw(p, "retorne")) {
+        Stmt *stmt = new_stmt(ST_RETURN);
+        if (!parse_expression(p, 1, &stmt->expr) || !expect_dot(p)) {
+            parser_expr_free(stmt->expr);
+            free(stmt);
+            return NULL;
+        }
+        return stmt;
+    }
+
     if (accept_kw(p, "leia")) {
         const Token *name = expect(p, TK_IDENT, "nome de variável",
                                    "Exemplo: Leia idade.");
@@ -1327,8 +1337,16 @@ static bool parse_function(Parser *p)
         break;
     }
 
-    if (!expect_dot(p) || !expect_kw(p, "retorna") ||
-        !parse_expression(p, 1, &function.return_expr) || !expect_dot(p)) {
+    if (!expect_dot(p)) goto error;
+    if (accept_kw(p, "inicio")) {
+        static const char *const stops[] = {"fimfuncao"};
+        if (!parse_block(p, stops, 1, &function.body, &function.body_count) ||
+            !expect_kw(p, "fimfuncao") || !expect_dot(p)) {
+            goto error;
+        }
+    } else if (!expect_kw(p, "retorna") ||
+               !parse_expression(p, 1, &function.return_expr) ||
+               !expect_dot(p)) {
         goto error;
     }
 
@@ -1348,6 +1366,10 @@ error:
     }
     free(function.params);
     parser_expr_free(function.return_expr);
+    for (int i = 0; i < function.body_count; i++) {
+        stmt_free(function.body[i]);
+    }
+    free(function.body);
     return false;
 }
 

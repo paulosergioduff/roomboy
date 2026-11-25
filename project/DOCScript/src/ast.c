@@ -35,7 +35,7 @@ static void expr_free(Expr *expr)
     free(expr);
 }
 
-static void stmt_free(Stmt *stmt)
+void stmt_free(Stmt *stmt)
 {
     if (!stmt) {
         return;
@@ -81,6 +81,10 @@ void program_free(Program *program)
         }
         free(function->params);
         expr_free(function->return_expr);
+        for (int j = 0; j < function->body_count; j++) {
+            stmt_free(function->body[j]);
+        }
+        free(function->body);
     }
     free(program->functions);
     for (int i = 0; i < program->body_count; i++) {

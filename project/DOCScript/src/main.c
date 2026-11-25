@@ -42,6 +42,7 @@ typedef struct {
     int check;
     int quiet;
     int warnings;
+    int module_only;
 } Options;
 
 static void usage(FILE *stream)
@@ -65,6 +66,7 @@ static void usage(FILE *stream)
           "      --language <idioma>    conjunto de palavras reservadas (padrão: pt)\n"
           "  -c, --only-c               não chama o compilador C\n"
           "      --run                  executa depois de compilar\n"
+          "      --module              gera apenas funções C para linkar a outro programa\n"
           "      --check                apenas analisa (não gera C)\n"
           "  -q, --quiet                não imprime mensagens de sucesso\n"
           "      --no-warnings          não imprime avisos semânticos\n"
@@ -102,6 +104,83 @@ static char *path_for_exec(const char *path)
     out[1] = '/';
     memcpy(out + 2, path, len + 1);
     return out;
+}
+
+static int report_io_error(const char *path, const char *action);
+
+static char *import_path(const char *source, const char *module)
+{
+    char *name = xstrdup(module);
+    if (!strrchr(name, '.')) {
+        size_t n = strlen(name);
+        name = realloc(name, n + 4);
+        memcpy(name + n, ".ds", 4);
+    }
+    const char *slash = strrchr(source, '/');
+    if (!slash) return name;
+    size_t dir_len = (size_t)(slash - source + 1);
+    char *path = xmalloc(dir_len + strlen(name) + 1);
+    memcpy(path, source, dir_len);
+    strcpy(path + dir_len, name);
+    free(name);
+    return path;
+}
+
+/* Arquivos importados são módulos DOCScript completos; suas funções passam
+ * a integrar o programa chamador. O corpo Inicio/Fim do módulo é ignorado. */
+static int load_imports(Program *program, const char *source_path)
+{
+    for (int i = 0; i < program->import_count; i++) {
+        size_t import_len = strlen(program->imports[i]);
+        if (import_len >= 2 && !strcmp(program->imports[i] + import_len - 2, ".h")) {
+            continue;
+        }
+        char *path = import_path(source_path, program->imports[i]);
+        char *source = read_file(path, NULL);
+        if (!source) {
+            report_io_error(path, "ler o módulo importado");
+            free(path);
+            return 0;
+        }
+        Diagnostic diag;
+        diag_clear(&diag);
+        diag_set_file(&diag, path);
+        TokenList tokens;
+        if (!tokenize_language(source, "pt", &tokens, &diag)) {
+            diag_set_file(&diag, path);
+            diag_print(&diag, stderr);
+            free(source); free(path);
+            return 0;
+        }
+        free(source);
+        Program module;
+        if (!parse_program(&tokens, &module, &diag)) {
+            diag_set_file(&diag, path);
+            diag_print(&diag, stderr);
+            token_list_free(&tokens); free(path);
+            return 0;
+        }
+        token_list_free(&tokens);
+        for (int j = 0; j < module.function_count; j++) {
+            for (int k = 0; k < program->function_count; k++) {
+                if (ident_ieq(module.functions[j].name, program->functions[k].name)) {
+                    fprintf(stderr, "docscript: função duplicada '%s' no módulo '%s'.\n",
+                            module.functions[j].name, path);
+                    program_free(&module); free(path);
+                    return 0;
+                }
+            }
+            program->functions = xrealloc(program->functions,
+                (size_t)(program->function_count + 1) * sizeof(Function));
+            program->functions[program->function_count++] = module.functions[j];
+        }
+        free(module.functions);
+        module.functions = NULL;
+        module.function_count = 0;
+        program_free(&module);
+        free(path);
+    }
+    return 1;
 }
 
 static int parse_options(int argc, char **argv, Options *options)
@@ -173,6 +252,12 @@ static int parse_options(int argc, char **argv, Options *options)
         }
         if (!strcmp(arg, "--run")) {
             options->run = 1;
+            continue;
+        }
+        if (!strcmp(arg, "--module")) {
+            options->module_only = 1;
+            options->only_c = 1;
+            options->save_c = 1;
             continue;
         }
         if (!strcmp(arg, "--check")) {
@@ -257,6 +342,11 @@ static int compile(const Options *options)
     }
     token_list_free(&tokens);
 
+    if (program.import_count && !load_imports(&program, options->input)) {
+        program_free(&program);
+        return EXIT_COMPILE;
+    }
+
     semantic_check(&program, options->input, options->warnings, stderr);
 
     if (options->check) {
@@ -268,7 +358,7 @@ static int compile(const Options *options)
         return EXIT_OK;
     }
 
-    char *code = codegen_program(&program);
+    char *code = codegen_program(&program, options->module_only);
     if (options->print_c) {
         fputs(code, stdout);
     }
